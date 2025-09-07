@@ -1,54 +1,43 @@
 // components/Announcements.js
 import { useState, useEffect } from 'react';
 
-// Пример данных объявлений (потом можно заменить на API)
-const announcementsData = [
-  {
-    id: 1,
-    title: "🎉 Добро пожаловать в Cloudес Market!",
-    text: "Торгуй скинами, участвуй в аукционах и находи редкие предметы. Начни свой путь трейдера прямо сейчас!",
-    type: "welcome",
-    date: "2024-01-15"
-  },
-  {
-    id: 2,
-    title: "🔥 Новые аукционы каждый день",
-    text: "Следи за горячими лотами! Редкие скины появляются в аукционах ежедневно. Не упусти свой шанс!",
-    type: "auction",
-    date: "2024-01-14"
-  },
-  {
-    id: 3,
-    title: "💎 Обновление тарифов",
-    text: "Теперь доступен новый тариф Pro с расширенными возможностями для профессиональных трейдеров.",
-    type: "update",
-    date: "2024-01-13"
-  },
-  {
-    id: 4,
-    title: "🛒 Маркет работает 24/7",
-    text: "Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры.",
-    type: "info",
-    date: "2024-01-12"
-  }
-];
-
 export default function Announcements() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Загружаем объявления при монтировании компонента
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   // Автопрокрутка каждые 5 секунд
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || announcements.length === 0) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % announcementsData.length);
+      setCurrentIndex(prev => (prev + 1) % announcements.length);
     }, 5000);
     
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, announcements.length]);
+
+  const fetchAnnouncements = async () => {
+    try {
+      const res = await fetch('/api/announcements');
+      const data = await res.json();
+      if (data.ok && data.announcements) {
+        setAnnouncements(data.announcements);
+      }
+    } catch (e) {
+      console.error('Error fetching announcements:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const goToSlide = (index) => {
     setCurrentIndex(index);
@@ -57,11 +46,11 @@ export default function Announcements() {
   };
 
   const nextSlide = () => {
-    goToSlide((currentIndex + 1) % announcementsData.length);
+    goToSlide((currentIndex + 1) % announcements.length);
   };
 
   const prevSlide = () => {
-    goToSlide((currentIndex - 1 + announcementsData.length) % announcementsData.length);
+    goToSlide((currentIndex - 1 + announcements.length) % announcements.length);
   };
 
   // Обработка свайпов
@@ -96,18 +85,55 @@ export default function Announcements() {
       case 'auction': return 'rgba(255,140,0,0.6)';
       case 'update': return 'rgba(138,43,226,0.6)';
       case 'info': return 'rgba(34,193,195,0.6)';
+      case 'market': return 'rgba(0,200,100,0.6)';
       default: return 'rgba(123,199,255,0.6)';
     }
   };
 
-  const currentAnnouncement = announcementsData[currentIndex];
+  const handleAnnouncementClick = (announcement) => {
+    if (announcement.telegram_link) {
+      window.open(announcement.telegram_link, '_blank');
+    }
+  };
+
+  // Показываем загрузку
+  if (loading) {
+    return (
+      <div className="announcements-container">
+        <div className="announcements-header">
+          <div className="announcements-title">📢 Объявления</div>
+          <div className="announcements-counter">Загрузка...</div>
+        </div>
+        <div className="announcements-slider" style={{height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <div style={{color: 'var(--muted)', fontSize: 14}}>⏳ Загружаем объявления...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Если объявлений нет
+  if (announcements.length === 0) {
+    return (
+      <div className="announcements-container">
+        <div className="announcements-header">
+          <div className="announcements-title">📢 Объявления</div>
+          <div className="announcements-counter">0 / 0</div>
+        </div>
+        <div className="announcements-slider" style={{height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <div style={{color: 'var(--muted)', fontSize: 14}}>📭 Объявлений пока нет</div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentAnnouncement = announcements[currentIndex];
 
   return (
     <div className="announcements-container">
       <div className="announcements-header">
         <div className="announcements-title">📢 Объявления</div>
         <div className="announcements-counter">
-          {currentIndex + 1} / {announcementsData.length}
+          {currentIndex + 1} / {announcements.length}
         </div>
       </div>
       
@@ -120,18 +146,30 @@ export default function Announcements() {
         <div 
           className="announcement-card"
           style={{'--type-color': getTypeColor(currentAnnouncement.type)}}
+          onClick={() => handleAnnouncementClick(currentAnnouncement)}
         >
           <div className="announcement-content">
-            <h3 className="announcement-title">{currentAnnouncement.title}</h3>
+            <h3 className="announcement-title">
+              {currentAnnouncement.title}
+              {currentAnnouncement.telegram_link && (
+                <span className="clickable-hint">👆</span>
+              )}
+            </h3>
             <p className="announcement-text">{currentAnnouncement.text}</p>
-            <div className="announcement-date">{currentAnnouncement.date}</div>
+            <div className="announcement-date">
+              {new Date(currentAnnouncement.created_at).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </div>
           </div>
         </div>
       </div>
       
       {/* Индикаторы точек */}
       <div className="announcements-dots">
-        {announcementsData.map((_, index) => (
+        {announcements.map((_, index) => (
           <button
             key={index}
             className={`dot ${index === currentIndex ? 'active' : ''}`}

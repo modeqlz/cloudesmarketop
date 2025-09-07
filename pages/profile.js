@@ -68,6 +68,10 @@ export default function ProfilePage() {
   const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Без имени';
   const at = user.username ? '@' + user.username : 'без username';
   const avatar = user.photo_url || '/placeholder.png';
+  
+  // Проверка админских прав (замени на свой Telegram ID)
+  const ADMIN_IDS = ['YOUR_TELEGRAM_ID']; // Сюда впиши свой telegram_id
+  const isAdmin = ADMIN_IDS.includes(user.telegram_id?.toString());
 
   return (
     <>
@@ -95,9 +99,18 @@ export default function ProfilePage() {
           </div>
 
           <div style={{marginTop:16, opacity:.85, fontSize:14}}>
-            <div><b>ID:</b> {user.id}</div>
+            <div><b>ID:</b> {user.telegram_id}</div>
             <div><b>Источник:</b> Telegram WebApp</div>
           </div>
+
+          {/* Админская кнопка */}
+          {isAdmin && (
+            <div style={{marginTop:20}}>
+              <a href="/admin" className="btn btn-primary" style={{width:'100%', textAlign:'center'}}>
+                🛠️ Админ-панель
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </>
