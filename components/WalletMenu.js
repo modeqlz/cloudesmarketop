@@ -1,13 +1,16 @@
 // components/WalletMenu.js
 import { useState, useEffect } from 'react';
+import TopUpModal from './TopUpModal';
 
 export default function WalletMenu({ isOpen, onClose, user }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [isTopUpOpen, setIsTopUpOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
     } else {
+      setIsTopUpOpen(false); // Закрываем TopUpModal при закрытии кошелька
       const timeout = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timeout);
     }
@@ -68,8 +71,8 @@ export default function WalletMenu({ isOpen, onClose, user }) {
 
         {/* Быстрые действия */}
         <div className="wallet-actions">
-          <div className="action-button" onClick={() => alert('Функция в разработке')}>
-            <div className="action-icon">📥</div>
+          <div className="action-button" onClick={() => setIsTopUpOpen(true)}>
+            <div className="action-icon">💳</div>
             <span>Пополнить</span>
           </div>
           <div className="action-button" onClick={() => alert('Функция в разработке')}>
@@ -155,6 +158,12 @@ export default function WalletMenu({ isOpen, onClose, user }) {
         </div>
       </div>
 
+      {/* TopUp Modal */}
+      <TopUpModal
+        isOpen={isTopUpOpen}
+        onClose={() => setIsTopUpOpen(false)}
+        userId={user?.id || 0}
+      />
     </div>
   );
 }
