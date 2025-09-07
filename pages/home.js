@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Head from 'next/head';
 import { useAuth } from '../lib/useAuth';
+import Announcements from '../components/Announcements';
 
 export default function HomePage() {
   const { user, loading, error } = useAuth();
@@ -62,6 +63,9 @@ export default function HomePage() {
             </a>
           </div>
 
+          {/* Announcements */}
+          <Announcements />
+
           {/* grid tiles */}
           <div className="grid">
             {/* Auctions */}
@@ -78,7 +82,7 @@ export default function HomePage() {
 
             {/* Market */}
             <a className="tile tile-gifts" href="/market">
-              <div className="tile-icon">🛍</div>
+              <div className="tile-icon">🛒</div>
               <div className="tile-head">
                 <div className="tile-title">Маркет</div>
               </div>
