@@ -5,16 +5,35 @@ import WalletMenu from './WalletMenu';
 export default function Sidebar({ isOpen, onClose, user }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [balanceLoading, setBalanceLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      loadWalletBalance(); // Загружаем баланс при открытии сайдбара
     } else {
       setIsWalletOpen(false); // Закрываем кошелек при закрытии сайдбара
       const timeout = setTimeout(() => setIsVisible(false), 200);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
+
+  const loadWalletBalance = async () => {
+    if (!user?.id) return;
+    
+    setBalanceLoading(true);
+    try {
+      const response = await fetch(`/api/wallet/balance?telegram_id=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setWalletBalance(data.balance_usd || 0);
+      }
+    } catch (error) {
+      console.error('Error loading wallet balance:', error);
+    }
+    setBalanceLoading(false);
+  };
 
   // Закрытие по клику на backdrop
   const handleBackdropClick = (e) => {
@@ -66,7 +85,9 @@ export default function Sidebar({ isOpen, onClose, user }) {
             <div className="wallet-icon">💳</div>
             <div className="wallet-info">
               <div className="wallet-title">Мой кошелек</div>
-              <div className="wallet-balance">$0.00</div>
+              <div className="wallet-balance">
+                {balanceLoading ? '⏳' : `$${walletBalance.toFixed(2)}`}
+              </div>
             </div>
             <div className="wallet-arrow">→</div>
           </div>
@@ -129,6 +150,7 @@ export default function Sidebar({ isOpen, onClose, user }) {
         isOpen={isWalletOpen}
         onClose={() => setIsWalletOpen(false)}
         user={user}
+        onBalanceUpdate={loadWalletBalance}
       />
     </div>
   );

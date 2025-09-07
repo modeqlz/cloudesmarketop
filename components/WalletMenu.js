@@ -1,17 +1,48 @@
 // components/WalletMenu.js
 import { useState, useEffect } from 'react';
 
-export default function WalletMenu({ isOpen, onClose, user }) {
+export default function WalletMenu({ isOpen, onClose, user, onBalanceUpdate }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      loadWalletData(); // Загружаем данные при открытии
     } else {
       const timeout = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
+
+  const loadWalletData = async () => {
+    if (!user?.id) return;
+    
+    setLoading(true);
+    try {
+      // Загружаем баланс и транзакции параллельно
+      const [balanceRes, transactionsRes] = await Promise.all([
+        fetch(`/api/wallet/balance?telegram_id=${user.id}`),
+        fetch(`/api/wallet/transactions?telegram_id=${user.id}&limit=10`)
+      ]);
+
+      if (balanceRes.ok) {
+        const balanceData = await balanceRes.json();
+        setBalance(balanceData.balance_usd || 0);
+      }
+
+      if (transactionsRes.ok) {
+        const transactionsData = await transactionsRes.json();
+        setTransactions(transactionsData.transactions || []);
+      }
+
+    } catch (error) {
+      console.error('Error loading wallet data:', error);
+    }
+    setLoading(false);
+  };
 
   // Закрытие по ESC
   useEffect(() => {
@@ -60,7 +91,9 @@ export default function WalletMenu({ isOpen, onClose, user }) {
             <div className="balance-icon">💳</div>
             <div className="balance-info">
               <div className="balance-label">Общий баланс</div>
-              <div className="balance-amount">$0.00</div>
+              <div className="balance-amount">
+                {loading ? '⏳' : `$${balance.toFixed(2)}`}
+              </div>
               <div className="balance-subtitle">Доступно для покупок</div>
             </div>
           </div>
@@ -88,11 +121,33 @@ export default function WalletMenu({ isOpen, onClose, user }) {
             <div className="section-title">📈 История операций</div>
             
             <div className="transaction-list">
-              <div className="transactions-empty">
-                <div className="empty-icon">📭</div>
-                <div className="empty-text">Пока операций нет</div>
-                <div className="empty-hint">Пополните баланс, чтобы начать пользоваться кошельком</div>
-              </div>
+              {loading ? (
+                <div className="transactions-loading">
+                  <div className="loading-spinner">⏳</div>
+                  <div>Загружаем операции...</div>
+                </div>
+              ) : transactions.length > 0 ? (
+                transactions.map((transaction) => (
+                  <div key={transaction.id} className="transaction-item">
+                    <div className={`transaction-icon ${transaction.className}`}>
+                      {transaction.icon}
+                    </div>
+                    <div className="transaction-info">
+                      <div className="transaction-title">{transaction.title}</div>
+                      <div className="transaction-date">{transaction.date}</div>
+                    </div>
+                    <div className={`transaction-amount ${transaction.className}`}>
+                      {transaction.amount_display}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="transactions-empty">
+                  <div className="empty-icon">📭</div>
+                  <div className="empty-text">Пока операций нет</div>
+                  <div className="empty-hint">Пополните баланс, чтобы начать пользоваться кошельком</div>
+                </div>
+              )}
             </div>
 
             <button className="show-all-button">
