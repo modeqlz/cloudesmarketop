@@ -9,6 +9,7 @@ export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   // Загружаем объявления при монтировании компонента
@@ -33,9 +34,80 @@ export default function Announcements() {
       const data = await res.json();
       if (data.ok && data.announcements) {
         setAnnouncements(data.announcements);
+      } else {
+        // Fallback: показываем тестовые объявления если база недоступна
+        setAnnouncements([
+          {
+            id: 1,
+            title: '🎉 Добро пожаловать в Cloudes Market!',
+            text: 'Торгуй скинами, участвуй в аукционах и находи редкие предметы. Начни свой путь трейдера прямо сейчас!',
+            type: 'welcome',
+            telegram_link: 'https://t.me/cloudesmarketop/1',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 2,
+            title: '🔥 Горячие аукционы каждый день',
+            text: 'Следи за горячими лотами! Редкие скины появляются в аукционах ежедневно. Не упусти свой шанс на выгодную сделку!',
+            type: 'auction',
+            telegram_link: 'https://t.me/cloudesmarketop/2',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 3,
+            title: '🛒 Маркет работает 24/7',
+            text: 'Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры. Более 10,000 предметов в каталоге!',
+            type: 'market',
+            telegram_link: 'https://t.me/cloudesmarketop/3',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: 4,
+            title: '💎 Новые возможности Pro тарифа',
+            text: 'Теперь доступен новый тариф Pro с расширенными возможностями для профессиональных трейдеров. Увеличенные лимиты и приоритетная поддержка!',
+            type: 'update',
+            telegram_link: 'https://t.me/cloudesmarketop/4',
+            created_at: new Date().toISOString()
+          }
+        ]);
       }
     } catch (e) {
       console.error('Error fetching announcements:', e);
+      // Fallback: показываем тестовые объявления при ошибке
+      setAnnouncements([
+        {
+          id: 1,
+          title: '🎉 Добро пожаловать в Cloudes Market!',
+          text: 'Торгуй скинами, участвуй в аукционах и находи редкие предметы. Начни свой путь трейдера прямо сейчас!',
+          type: 'welcome',
+          telegram_link: 'https://t.me/cloudesmarketop/1',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: '🔥 Горячие аукционы каждый день',
+          text: 'Следи за горячими лотами! Редкие скины появляются в аукционах ежедневно. Не упусти свой шанс на выгодную сделку!',
+          type: 'auction',
+          telegram_link: 'https://t.me/cloudesmarketop/2',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          title: '🛒 Маркет работает 24/7',
+          text: 'Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры. Более 10,000 предметов в каталоге!',
+          type: 'market',
+          telegram_link: 'https://t.me/cloudesmarketop/3',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 4,
+          title: '💎 Новые возможности Pro тарифа',
+          text: 'Теперь доступен новый тариф Pro с расширенными возможностями для профессиональных трейдеров. Увеличенные лимиты и приоритетная поддержка!',
+          type: 'update',
+          telegram_link: 'https://t.me/cloudesmarketop/4',
+          created_at: new Date().toISOString()
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -147,6 +219,8 @@ export default function Announcements() {
       </div>
     );
   }
+
+  const currentAnnouncement = announcements[currentIndex];
 
   return (
     <div className="announcements-container">
