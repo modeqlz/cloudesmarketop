@@ -2,9 +2,12 @@ import { useEffect } from 'react';
 import Head from 'next/head';
 import { useAuth } from '../lib/useAuth';
 import Announcements from '../components/Announcements';
+import Sidebar from '../components/Sidebar';
+import useSidebar from '../lib/useSidebar';
 
 export default function HomePage() {
   const { user, loading, error } = useAuth();
+  const { isOpen, openSidebar, closeSidebar, touchHandlers } = useSidebar();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -46,12 +49,19 @@ export default function HomePage() {
 
   return (
     <>
-      <Head><title>Главное меню — Cloudес Market</title></Head>
-      <div className="container">
+      <Head><title>Главное меню — Spectra Market</title></Head>
+      <div className="container" {...touchHandlers}>
         <div className="hero" style={{maxWidth:980}}>
           {/* top bar */}
           <div className="topbar">
             <div className="topbar-left">
+              <button 
+                className="menu-button"
+                onClick={openSidebar}
+                aria-label="Открыть меню"
+              >
+                ☰
+              </button>
               <img className="avatar" src={avatar} alt="avatar" />
               <div className="hello">
                 <div className="hello-hi">Привет, {name}</div>
@@ -124,6 +134,13 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      
+      {/* Sidebar */}
+      <Sidebar 
+        isOpen={isOpen} 
+        onClose={closeSidebar} 
+        user={user} 
+      />
     </>
   );
 }
