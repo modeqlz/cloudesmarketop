@@ -18,19 +18,23 @@
 2. Скопируй:
    - `URL` (Project URL)
    - `anon public` ключ
+   - `service_role` ключ
 
 ## 4. Настройка переменных окружения
 
 ### Для локальной разработки:
 Создай файл `.env.local` со следующими переменными:
 ```
-BOT_TOKEN=твой_бот_токен
+TELEGRAM_BOT_TOKEN=твой_бот_токен
 NEXT_PUBLIC_SUPABASE_URL=https://твой-проект.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=твой_anon_ключ
+SUPABASE_SERVICE_ROLE=твой_service_role_ключ
 ```
 
 ### Для Vercel (продакшн):
 Добавь эти же переменные в **Vercel Dashboard** → **Settings** → **Environment Variables**
+
+**Важно:** Service Role ключ дает полный доступ к базе данных, поэтому используй его только на сервере!
 
 ## 5. Установка зависимостей
 
@@ -73,10 +77,11 @@ npm install
 - Настроены политики доступа
 - Проверка подписи Telegram WebApp
 - Все данные проходят валидацию
+- **Service Role** используется только на сервере
 
 ## ❗ Важно
 
 - Переменные `NEXT_PUBLIC_*` будут видны в браузере
-- Для чувствительных операций используй серверные API routes
+- `SUPABASE_SERVICE_ROLE` дает полный доступ - храни в секрете!
 - Supabase `anon` ключ безопасен для клиентского кода
 - Проверь настройки RLS в продакшне

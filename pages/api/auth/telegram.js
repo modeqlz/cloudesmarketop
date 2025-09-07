@@ -1,6 +1,6 @@
 // pages/api/auth/telegram.js
 import { validateInitData, parseInitData } from '../../../lib/verifyTelegramAuth.js';
-import { supabase } from '../../../lib/supabase.js';
+import { supabaseAdmin } from '../../../lib/supabase.js';
 
 // Явно укажем Node-runtime (на всякий случай, чтобы не уехало в Edge)
 export const config = {
@@ -14,9 +14,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const BOT_TOKEN = process.env.BOT_TOKEN;
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     if (!BOT_TOKEN) {
-      return res.status(500).json({ ok: false, error: 'Missing BOT_TOKEN on server' });
+      return res.status(500).json({ ok: false, error: 'Missing TELEGRAM_BOT_TOKEN on server' });
     }
 
     // Поддержим и raw string, и body { initData }
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     // Сохраняем пользователя в Supabase
     if (profile) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
           .from('users')
           .upsert([
             {
