@@ -71,6 +71,13 @@ export default async function handler(
       phone_number_collection: {
         enabled: false,
       },
+      // Дополнительные настройки для WebView
+      billing_address_collection: 'auto',
+      shipping_address_collection: {
+        allowed_countries: [],
+      },
+      // Отключаем сбор адреса доставки
+      allow_promotion_codes: false,
     })
 
     res.status(200).json({ url: session.url })

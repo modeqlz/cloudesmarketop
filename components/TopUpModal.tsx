@@ -205,6 +205,14 @@ export default function TopUpModal({ isOpen, onClose, userId, onSuccess }: TopUp
           <p className="payment-note">
             💡 Payment will open in your browser where Google Pay and all cards are supported.
           </p>
+          
+          <div className="webview-notice">
+            <div className="notice-icon">ℹ️</div>
+            <div className="notice-text">
+              <strong>Note:</strong> If you see "Google Pay unavailable" message, don't worry! 
+              The payment page will open in your external browser where Google Pay will be available.
+            </div>
+          </div>
         </div>
       </div>
     </div>
