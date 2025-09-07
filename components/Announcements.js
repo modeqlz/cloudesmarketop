@@ -9,7 +9,6 @@ export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
   // Загружаем объявления при монтировании компонента
@@ -42,21 +41,19 @@ export default function Announcements() {
     }
   };
 
-  const goToSlide = (index, animated = true) => {
-    if (isTransitioning) return;
+  const goToSlide = (index) => {
+    if (isTransitioning || index === currentIndex) return;
     
-    if (animated) {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentIndex(index);
-        setIsTransitioning(false);
-      }, 150);
-    } else {
-      setCurrentIndex(index);
-    }
+    setIsTransitioning(true);
+    setCurrentIndex(index);
     
-    setIsAutoPlaying(false); // Останавливаем автопрокрутку при ручном переключении
-    setTimeout(() => setIsAutoPlaying(true), 10000); // Возобновляем через 10 сек
+    // Оптимизированный таймаут для плавности
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 300);
+    
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 8000); // Сократил время
   };
 
   const nextSlide = () => {
@@ -71,49 +68,37 @@ export default function Announcements() {
     }
   };
 
-  // Обработка свайпов с плавной анимацией
-  const minSwipeDistance = 50;
-  const maxSwipeOffset = 80;
+  // Упрощенная обработка свайпов
+  const minSwipeDistance = 40;
 
   const onTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
     setTouchEnd(null);
     setIsDragging(true);
-    setIsAutoPlaying(false); // Останавливаем автопрокрутку при начале свайпа
   };
 
   const onTouchMove = (e) => {
     if (!touchStart || !isDragging) return;
-    
-    const currentTouch = e.targetTouches[0].clientX;
-    const diff = currentTouch - touchStart;
-    
-    // Ограничиваем смещение для упругого эффекта
-    const limitedOffset = Math.max(-maxSwipeOffset, Math.min(maxSwipeOffset, diff * 0.3));
-    setSwipeOffset(limitedOffset);
-    setTouchEnd(currentTouch);
+    setTouchEnd(e.targetTouches[0].clientX);
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !isDragging) return;
+    if (!touchStart || !touchEnd || !isDragging) return;
     
     setIsDragging(false);
-    setSwipeOffset(0);
     
-    if (touchEnd) {
-      const distance = touchStart - touchEnd;
-      const isLeftSwipe = distance > minSwipeDistance;
-      const isRightSwipe = distance < -minSwipeDistance;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
 
-      if (isLeftSwipe) {
-        nextSlide(); // Свайп влево - следующий слайд
-      } else if (isRightSwipe) {
-        prevSlide(); // Свайп вправо - предыдущий слайд
-      }
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
     }
     
-    // Возобновляем автопрокрутку через 3 секунды
-    setTimeout(() => setIsAutoPlaying(true), 3000);
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
   const getTypeColor = (type) => {
@@ -163,8 +148,6 @@ export default function Announcements() {
     );
   }
 
-  const currentAnnouncement = announcements[currentIndex];
-
   return (
     <div className="announcements-container">
       <div className="announcements-header">
@@ -184,19 +167,19 @@ export default function Announcements() {
           {announcements.map((announcement, index) => {
             const offset = index - currentIndex;
             const isActive = index === currentIndex;
-            const isPrev = index === (currentIndex - 1 + announcements.length) % announcements.length;
-            const isNext = index === (currentIndex + 1) % announcements.length;
+            const isVisible = Math.abs(offset) <= 1; // Показываем только текущую и соседние
+            
+            if (!isVisible) return null; // Не рендерим далекие карточки
             
             return (
               <div
                 key={announcement.id}
-                className={`announcement-card ${isActive ? 'active' : ''} ${isPrev ? 'prev' : ''} ${isNext ? 'next' : ''}`}
+                className={`announcement-card ${isActive ? 'active' : ''}`}
                 style={{
                   '--type-color': getTypeColor(announcement.type),
-                  '--offset': offset,
-                  transform: `translateX(${(offset * 100) + swipeOffset}%) scale(${isActive ? 1 : 0.95})`,
-                  opacity: Math.abs(offset) <= 1 ? (1 - Math.abs(offset) * 0.3) : 0,
-                  zIndex: isActive ? 10 : (Math.abs(offset) <= 1 ? 5 : 1),
+                  transform: `translateX(${offset * 100}%) scale(${isActive ? 1 : 0.95})`,
+                  opacity: isActive ? 1 : 0.4,
+                  zIndex: isActive ? 10 : 5,
                   pointerEvents: isActive ? 'auto' : 'none'
                 }}
                 onClick={() => isActive && handleAnnouncementClick(announcement)}
@@ -242,29 +225,12 @@ export default function Announcements() {
         </div>
       </div>
       
-      {/* Индикаторы точек с анимацией */}
-      <div className="announcements-dots">
-        <div className="dots-track">
-          {announcements.map((_, index) => (
-            <button
-              key={index}
-              className={`dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Объявление ${index + 1}`}
-              style={{
-                '--delay': `${index * 0.1}s`
-              }}
-            />
-          ))}
-          <div 
-            className="dot-indicator" 
-            style={{
-              transform: `translateX(${currentIndex * (16 + 8)}px)` // 16px width + 8px gap
-            }}
-          />
+      {/* Полоска прогресса */}
+      <div className="announcements-progress">
+        <div className="progress-info">
+          <span className="progress-text">{currentIndex + 1} из {announcements.length}</span>
+          <span className="progress-percentage">{Math.round(((currentIndex + 1) / announcements.length) * 100)}%</span>
         </div>
-        
-        {/* Полоска прогресса */}
         <div className="progress-bar">
           <div 
             className="progress-fill"
