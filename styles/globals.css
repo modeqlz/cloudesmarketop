@@ -225,80 +225,90 @@ body{
 .tile-list{ margin:10px 0 0; padding-left:18px; color:var(--muted); font-size:14px; }
 .tile-list li{ margin:4px 0; }
 
-/* Красивые градиенты для каждого блока */
+/* Стильные фоны для каждого блока */
 .tile-auction{
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(255,140,0,0.05) 50%, 
-    rgba(255,69,0,0.1) 100%
-  );
+  background: var(--panel);
+  border-left: 3px solid rgba(255,140,0,0.6);
+  position: relative;
 }
-.tile-auction:hover{ 
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(255,140,0,0.08) 50%, 
-    rgba(255,69,0,0.15) 100%
-  ); 
+.tile-auction::before{
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(255,69,0,0.08));
+  pointer-events: none;
+}
+.tile-auction:hover{
+  border-left-color: rgba(255,140,0,0.9);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 20px rgba(255,140,0,0.1);
 }
 
 .tile-gifts{
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(253,187,45,0.05) 50%, 
-    rgba(34,193,195,0.1) 100%
-  );
+  background: var(--panel);
+  border-left: 3px solid rgba(34,193,195,0.6);
+  position: relative;
 }
-.tile-gifts:hover{ 
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(253,187,45,0.08) 50%, 
-    rgba(34,193,195,0.15) 100%
-  ); 
+.tile-gifts::before{
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(34,193,195,0.08));
+  pointer-events: none;
+}
+.tile-gifts:hover{
+  border-left-color: rgba(34,193,195,0.9);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 20px rgba(34,193,195,0.1);
 }
 
 .tile-plans{
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(75,0,130,0.05) 50%, 
-    rgba(138,43,226,0.1) 100%
-  );
+  background: var(--panel);
+  border-left: 3px solid rgba(138,43,226,0.6);
+  position: relative;
 }
-.tile-plans:hover{ 
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(75,0,130,0.08) 50%, 
-    rgba(138,43,226,0.15) 100%
-  ); 
+.tile-plans::before{
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(138,43,226,0.08));
+  pointer-events: none;
+}
+.tile-plans:hover{
+  border-left-color: rgba(138,43,226,0.9);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 20px rgba(138,43,226,0.1);
 }
 
 .tile-orders{
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(50,205,50,0.05) 50%, 
-    rgba(0,128,0,0.1) 100%
-  );
+  background: var(--panel);
+  border-left: 3px solid rgba(0,200,100,0.6);
+  position: relative;
 }
-.tile-orders:hover{ 
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(50,205,50,0.08) 50%, 
-    rgba(0,128,0,0.15) 100%
-  ); 
+.tile-orders::before{
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,100,0.08));
+  pointer-events: none;
+}
+.tile-orders:hover{
+  border-left-color: rgba(0,200,100,0.9);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 20px rgba(0,200,100,0.1);
 }
 
 .tile-create{
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(183,163,255,0.05) 50%, 
-    rgba(123,199,255,0.1) 100%
-  );
+  background: var(--panel);
+  border-left: 3px solid rgba(123,199,255,0.6);
+  position: relative;
 }
-.tile-create:hover{ 
-  background: linear-gradient(135deg, 
-    var(--panel) 0%, 
-    rgba(183,163,255,0.08) 50%, 
-    rgba(123,199,255,0.15) 100%
-  ); 
+.tile-create::before{
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(123,199,255,0.08));
+  pointer-events: none;
+}
+.tile-create:hover{
+  border-left-color: rgba(123,199,255,0.9);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 20px rgba(123,199,255,0.1);
 }
 
 /* ======= SEARCH STYLES ======= */
