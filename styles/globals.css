@@ -218,3 +218,41 @@ body{
 .tile-create{
   background: var(--panel) !important;
 }
+
+/* ======= SEARCH STYLES ======= */
+
+.search-row{ 
+  display:flex; align-items:center; gap:12px; margin-top:20px; 
+  padding:16px; border-radius:16px; background:var(--card); border:1px solid var(--border);
+}
+.search-row .at{ 
+  font-weight:800; color:var(--brand); font-size:18px; 
+}
+.search-row .input{ 
+  flex:1; background:transparent; border:none; outline:none; 
+  color:var(--text); font-size:16px; font-weight:600;
+}
+.search-row .input::placeholder{ color:var(--muted); }
+
+.user-list{ margin-top:24px; display:flex; flex-direction:column; gap:12px; }
+.user-row{ 
+  display:flex; align-items:center; gap:16px; padding:16px; 
+  border-radius:16px; background:var(--panel); border:1px solid var(--border);
+  text-decoration:none; color:var(--text); transition: all .2s ease;
+}
+.user-row:hover{ 
+  transform:translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); 
+  border-color:var(--brand);
+}
+
+.user-avatar{ 
+  width:48px; height:48px; border-radius:12px; object-fit:cover;
+  border:1px solid var(--border);
+}
+.user-meta{ flex:1; }
+.user-name{ font-weight:700; font-size:16px; margin-bottom:4px; }
+.user-handle{ color:var(--muted); font-size:14px; }
+.user-open{ 
+  color:var(--brand); font-weight:600; font-size:14px; 
+  padding:8px 12px; border-radius:8px; background:rgba(123,199,255,.1);
+}

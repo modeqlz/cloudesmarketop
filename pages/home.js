@@ -45,7 +45,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Head><title>Главное меню — Cloudес Market</title></Head>
+      <Head><title>Главное меню — Spectra Market</title></Head>
       <div className="container">
         <div className="hero" style={{maxWidth:980}}>
           {/* top bar */}
@@ -71,17 +71,17 @@ export default function HomePage() {
                 <div className="tile-badge">Live</div>
               </div>
               <div className="tile-desc">
-                Делай ставки на редкие скины в реальном времени.
+                Делай ставки на редкие подарки в реальном времени.
               </div>
             </a>
 
-            {/* Market */}
-            <a className="tile tile-gifts" href="/market">
+            {/* Gifts */}
+            <a className="tile tile-gifts" href="/gifts">
               <div className="tile-head">
-                <div className="tile-title">Маркет</div>
+                <div className="tile-title">Подарки</div>
               </div>
               <div className="tile-desc">
-                Каталог скинов и предметов — покупай и продавай в один клик.
+                Каталог наборов и коллекций — отправляй друзьям в один тап.
               </div>
             </a>
 
@@ -97,20 +97,20 @@ export default function HomePage() {
               </ul>
             </a>
 
-            {/* My inventory */}
-            <a className="tile tile-orders" href="/inventory">
+            {/* My purchases */}
+            <a className="tile tile-orders" href="/orders">
               <div className="tile-head">
-                <div className="tile-title">Инвентарь</div>
+                <div className="tile-title">Покупки</div>
               </div>
-              <div className="tile-desc">Мои скины и история покупок.</div>
+              <div className="tile-desc">История покупок и статусы отправки.</div>
             </a>
 
-            {/* Create listing */}
-            <a className="tile tile-create" href="/sell">
+            {/* Find user */}
+            <a className="tile tile-create" href="/search">
               <div className="tile-head">
-                <div className="tile-title">Продать скин</div>
+                <div className="tile-title">Найти человека</div>
               </div>
-              <div className="tile-desc">Выставь свои предметы на продажу.</div>
+              <div className="tile-desc">Найди пользователя по @никнейму и посмотри его профиль.</div>
             </a>
           </div>
         </div>
