@@ -8,6 +8,9 @@ export default function Announcements() {
   const [touchEnd, setTouchEnd] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Загружаем объявления при монтировании компонента
   useEffect(() => {
@@ -39,44 +42,78 @@ export default function Announcements() {
     }
   };
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
+  const goToSlide = (index, animated = true) => {
+    if (isTransitioning) return;
+    
+    if (animated) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex(index);
+        setIsTransitioning(false);
+      }, 150);
+    } else {
+      setCurrentIndex(index);
+    }
+    
     setIsAutoPlaying(false); // Останавливаем автопрокрутку при ручном переключении
     setTimeout(() => setIsAutoPlaying(true), 10000); // Возобновляем через 10 сек
   };
 
   const nextSlide = () => {
-    goToSlide((currentIndex + 1) % announcements.length);
+    if (!isTransitioning) {
+      goToSlide((currentIndex + 1) % announcements.length);
+    }
   };
 
   const prevSlide = () => {
-    goToSlide((currentIndex - 1 + announcements.length) % announcements.length);
+    if (!isTransitioning) {
+      goToSlide((currentIndex - 1 + announcements.length) % announcements.length);
+    }
   };
 
-  // Обработка свайпов
+  // Обработка свайпов с плавной анимацией
   const minSwipeDistance = 50;
+  const maxSwipeOffset = 80;
 
   const onTouchStart = (e) => {
-    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+    setIsDragging(true);
+    setIsAutoPlaying(false); // Останавливаем автопрокрутку при начале свайпа
   };
 
   const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!touchStart || !isDragging) return;
+    
+    const currentTouch = e.targetTouches[0].clientX;
+    const diff = currentTouch - touchStart;
+    
+    // Ограничиваем смещение для упругого эффекта
+    const limitedOffset = Math.max(-maxSwipeOffset, Math.min(maxSwipeOffset, diff * 0.3));
+    setSwipeOffset(limitedOffset);
+    setTouchEnd(currentTouch);
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !isDragging) return;
     
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    setIsDragging(false);
+    setSwipeOffset(0);
+    
+    if (touchEnd) {
+      const distance = touchStart - touchEnd;
+      const isLeftSwipe = distance > minSwipeDistance;
+      const isRightSwipe = distance < -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      nextSlide(); // Свайп влево - следующий слайд
-    } else if (isRightSwipe) {
-      prevSlide(); // Свайп вправо - предыдущий слайд
+      if (isLeftSwipe) {
+        nextSlide(); // Свайп влево - следующий слайд
+      } else if (isRightSwipe) {
+        prevSlide(); // Свайп вправо - предыдущий слайд
+      }
     }
+    
+    // Возобновляем автопрокрутку через 3 секунды
+    setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
   const getTypeColor = (type) => {
@@ -143,40 +180,99 @@ export default function Announcements() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <div 
-          className="announcement-card"
-          style={{'--type-color': getTypeColor(currentAnnouncement.type)}}
-          onClick={() => handleAnnouncementClick(currentAnnouncement)}
-        >
-          <div className="announcement-content">
-            <h3 className="announcement-title">
-              {currentAnnouncement.title}
-              {currentAnnouncement.telegram_link && (
-                <span className="clickable-hint">👆</span>
-              )}
-            </h3>
-            <p className="announcement-text">{currentAnnouncement.text}</p>
-            <div className="announcement-date">
-              {new Date(currentAnnouncement.created_at).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </div>
-          </div>
+        <div className="announcements-wrapper">
+          {announcements.map((announcement, index) => {
+            const offset = index - currentIndex;
+            const isActive = index === currentIndex;
+            const isPrev = index === (currentIndex - 1 + announcements.length) % announcements.length;
+            const isNext = index === (currentIndex + 1) % announcements.length;
+            
+            return (
+              <div
+                key={announcement.id}
+                className={`announcement-card ${isActive ? 'active' : ''} ${isPrev ? 'prev' : ''} ${isNext ? 'next' : ''}`}
+                style={{
+                  '--type-color': getTypeColor(announcement.type),
+                  '--offset': offset,
+                  transform: `translateX(${(offset * 100) + swipeOffset}%) scale(${isActive ? 1 : 0.95})`,
+                  opacity: Math.abs(offset) <= 1 ? (1 - Math.abs(offset) * 0.3) : 0,
+                  zIndex: isActive ? 10 : (Math.abs(offset) <= 1 ? 5 : 1),
+                  pointerEvents: isActive ? 'auto' : 'none'
+                }}
+                onClick={() => isActive && handleAnnouncementClick(announcement)}
+              >
+                <div className="announcement-content">
+                  <div className="announcement-type-badge">{announcement.type}</div>
+                  <h3 className="announcement-title">
+                    {announcement.title}
+                    {announcement.telegram_link && (
+                      <span className="clickable-hint">👆</span>
+                    )}
+                  </h3>
+                  <p className="announcement-text">{announcement.text}</p>
+                  <div className="announcement-meta">
+                    <div className="announcement-date">
+                      {new Date(announcement.created_at).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                    </div>
+                    {announcement.telegram_link && (
+                      <div className="announcement-link-indicator">
+                        <span>🔗</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Декоративный градиент */}
+                <div className="announcement-gradient"></div>
+                
+                {/* Эмодзи-декорация по типу */}
+                <div className="announcement-emoji">
+                  {announcement.type === 'welcome' && '🎉'}
+                  {announcement.type === 'auction' && '🔥'}
+                  {announcement.type === 'update' && '💎'}
+                  {announcement.type === 'market' && '🛒'}
+                  {announcement.type === 'info' && 'ℹ️'}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
       
-      {/* Индикаторы точек */}
+      {/* Индикаторы точек с анимацией */}
       <div className="announcements-dots">
-        {announcements.map((_, index) => (
-          <button
-            key={index}
-            className={`dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => goToSlide(index)}
-            aria-label={`Объявление ${index + 1}`}
+        <div className="dots-track">
+          {announcements.map((_, index) => (
+            <button
+              key={index}
+              className={`dot ${index === currentIndex ? 'active' : ''}`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Объявление ${index + 1}`}
+              style={{
+                '--delay': `${index * 0.1}s`
+              }}
+            />
+          ))}
+          <div 
+            className="dot-indicator" 
+            style={{
+              transform: `translateX(${currentIndex * (16 + 8)}px)` // 16px width + 8px gap
+            }}
           />
-        ))}
+        </div>
+        
+        {/* Полоска прогресса */}
+        <div className="progress-bar">
+          <div 
+            className="progress-fill"
+            style={{
+              width: `${((currentIndex + 1) / announcements.length) * 100}%`
+            }}
+          />
+        </div>
       </div>
     </div>
   );
