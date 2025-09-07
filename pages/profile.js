@@ -1,90 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Head from 'next/head';
 import LoadingCard from '../components/LoadingCard';
-
-function readStoredProfile() {
-  try {
-    const a = localStorage.getItem('profile');
-    if (a) return JSON.parse(a);
-  } catch {}
-  try {
-    const b = sessionStorage.getItem('profile');
-    if (b) return JSON.parse(b);
-  } catch {}
-  return null;
-}
+import { useAuth } from '../lib/useAuth';
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState(null);
-  const [busy, setBusy] = useState(true);
-  const [msg, setMsg] = useState('');
+  const { user, loading, error, logout } = useAuth();
 
   useEffect(() => {
-    (async () => {
-      setBusy(true);
-      setMsg('');
+    if (!loading && !user) {
+      window.location.replace('/');
+    }
+  }, [user, loading]);
 
-      // ⛔ если пользователь нажал «Выйти» — не автологиним
-      if (sessionStorage.getItem('logged_out') === '1') {
-        setBusy(false);
-        setMsg('Вы вышли из аккаунта.');
-        return;
-      }
-
-      // 1) пробуем взять из local/session storage
-      const cached = readStoredProfile();
-      if (cached) {
-        setProfile(cached);
-        setBusy(false);
-        return;
-      }
-
-      // 2) тихий ре-логин, если есть initData из Telegram
-      try {
-        const tg = typeof window !== 'undefined' ? window.Telegram?.WebApp : null;
-        const initData = tg?.initData || '';
-        if (initData) {
-          const res = await fetch('/api/auth/telegram', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ initData })
-          }).then(r => r.json());
-
-          if (res.ok && res.profile) {
-            try { localStorage.setItem('profile', JSON.stringify(res.profile)); } catch {}
-            setProfile(res.profile);
-            setBusy(false);
-            return;
-          }
-        }
-      } catch {}
-
-      // 3) не вышло
-      setBusy(false);
-      setMsg('Нет данных профиля. Вернитесь на главную и войдите заново.');
-    })();
-  }, []);
-
-  function handleLogout() {
-    try { localStorage.removeItem('profile'); } catch {}
-    try { sessionStorage.removeItem('profile'); } catch {}
-    try { sessionStorage.setItem('logged_out', '1'); } catch {}
-    // уходим на главную так, чтобы нельзя было вернуться «Назад»
-    window.location.replace('/');
-  }
-
-  if (busy) {
+  if (loading) {
     return (
       <>
-        <Head><title>Профиль — Cloudес Market</title></Head>
+        <Head><title>Профиль — Spectra Market</title></Head>
         <div className="overlay" aria-hidden>
           <div className="overlay-backdrop" />
           <div className="overlay-panel">
             <LoadingCard
               messages={[
-                'Ищем сохранённый профиль…',
-                'Проверяем авторизацию…',
-                'Восстанавливаем сессию…',
+                'Проверяем профиль…',
+                'Валидируем данные…',
+                'Загружаем информацию…',
                 'Готовим профиль…'
               ]}
               intervalMs={700}
@@ -96,13 +35,27 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profile) {
+  if (error) {
     return (
       <>
-        <Head><title>Профиль — Cloudес Market</title></Head>
+        <Head><title>Профиль — Spectra Market</title></Head>
         <div className="container">
           <div className="hero" style={{maxWidth:560, textAlign:'center', padding:'32px'}}>
-            <p className="lead" style={{marginBottom:16}}>{msg || 'Нет данных профиля.'}</p>
+            <div style={{color:'#ffb4b4', marginBottom:16}}>⚠️ {error}</div>
+            <div>Перенаправляем на главную...</div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Head><title>Профиль — Spectra Market</title></Head>
+        <div className="container">
+          <div className="hero" style={{maxWidth:560, textAlign:'center', padding:'32px'}}>
+            <p className="lead" style={{marginBottom:16}}>Нет данных профиля.</p>
             <div className="row" style={{justifyContent:'center'}}>
               <a className="btn btn-primary" href="/">На главную</a>
             </div>
@@ -112,18 +65,18 @@ export default function ProfilePage() {
     );
   }
 
-  const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Без имени';
-  const at = profile.username ? '@' + profile.username : 'без username';
-  const avatar = profile.photo_url || '/placeholder.png';
+  const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Без имени';
+  const at = user.username ? '@' + user.username : 'без username';
+  const avatar = user.photo_url || '/placeholder.png';
 
   return (
     <>
-      <Head><title>Профиль — Cloudес Market</title></Head>
+      <Head><title>Профиль — Spectra Market</title></Head>
       <div className="container">
         <div className="hero" style={{maxWidth:560}}>
           <div className="brand" style={{justifyContent:'space-between', width:'100%'}}>
             <span>Профиль</span>
-            <button className="btn btn-ghost" onClick={handleLogout}>Выйти</button>
+            <button className="btn btn-ghost" onClick={logout}>Выйти</button>
           </div>
 
           <div style={{display:'flex', alignItems:'center', gap:14, marginTop:6}}>
@@ -142,12 +95,8 @@ export default function ProfilePage() {
           </div>
 
           <div style={{marginTop:16, opacity:.85, fontSize:14}}>
-            <div><b>ID:</b> {profile.id}</div>
+            <div><b>ID:</b> {user.id}</div>
             <div><b>Источник:</b> Telegram WebApp</div>
-          </div>
-
-          <div className="row" style={{marginTop:20}}>
-            <a className="btn btn-primary" href="/home">Главное меню</a>
           </div>
         </div>
       </div>

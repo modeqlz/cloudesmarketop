@@ -1,37 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Head from 'next/head';
-
-function readStoredProfile() {
-  try {
-    const a = localStorage.getItem('profile');
-    if (a) return JSON.parse(a);
-  } catch {}
-  try {
-    const b = sessionStorage.getItem('profile');
-    if (b) return JSON.parse(b);
-  } catch {}
-  return null;
-}
+import { useAuth } from '../lib/useAuth';
 
 export default function HomePage() {
-  const [p, setP] = useState(null);
+  const { user, loading, error } = useAuth();
 
   useEffect(() => {
-    // если пользователь вышел — на главную
-    if (sessionStorage.getItem('logged_out') === '1') {
+    if (!loading && !user) {
+      // Нет пользователя - редирект на логин
       window.location.replace('/');
-      return;
     }
-    const cached = readStoredProfile();
-    if (!cached) {
-      // нет профиля — на экран логина
-      window.location.replace('/');
-      return;
-    }
-    setP(cached);
-  }, []);
+  }, [user, loading]);
 
-  if (!p) {
+  if (loading) {
     return (
       <div className="container">
         <div className="hero" style={{maxWidth:560, textAlign:'center'}}>Загружаем меню…</div>
@@ -39,9 +20,28 @@ export default function HomePage() {
     );
   }
 
-  const name = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Гость';
-  const avatar = p.photo_url || '/placeholder.png';
-  const at = p.username ? '@' + p.username : '';
+  if (error) {
+    return (
+      <div className="container">
+        <div className="hero" style={{maxWidth:560, textAlign:'center'}}>
+          <div style={{color:'#ffb4b4', marginBottom:16}}>⚠️ {error}</div>
+          <div>Перенаправляем на главную...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container">
+        <div className="hero" style={{maxWidth:560, textAlign:'center'}}>Загружаем…</div>
+      </div>
+    );
+  }
+
+  const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Гость';
+  const avatar = user.photo_url || '/placeholder.png';
+  const at = user.username ? '@' + user.username : '';
 
   return (
     <>
