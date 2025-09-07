@@ -31,7 +31,7 @@ export default function SearchPage() {
 
   return (
     <>
-      <Head><title>Найти человека — Spectra</title></Head>
+      <Head><title>Найти человека — Cloudес Market</title></Head>
       <div className="container">
         <div className="hero">
           <div className="brand">
@@ -45,14 +45,12 @@ export default function SearchPage() {
             <span className="at">@</span>
             <input
               className="input"
-              placeholder="username"
+              placeholder="Введи никнейм..."
               value={q}
               onChange={(e)=>setQ(e.target.value)}
               autoFocus
             />
-            <button className="btn btn-primary" onClick={()=>runSearch(q)} disabled={busy}>
-              {busy ? 'Ищем…' : 'Найти'}
-            </button>
+            {busy && <div className="search-spinner">🔍</div>}
           </div>
 
           {error && <div className="foot" style={{color:'#ffb4b4'}}>Ошибка: {error}</div>}

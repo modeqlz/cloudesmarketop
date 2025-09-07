@@ -189,15 +189,30 @@ body{
 
 .tile{
   position:relative; display:block; padding:18px; border-radius:18px;
-  background: var(--panel);            /* <— РОВНЫЙ ФОН ДЛЯ ВСЕХ ПЛИТОК */
+  background: var(--panel);
   border:1px solid var(--border);
   box-shadow: 0 12px 36px rgba(0,0,0,.35);
   text-decoration:none; color:var(--text);
-  transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
+  transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease, background .3s ease;
   min-height: 140px;
+  overflow:hidden;
 }
-.tile:hover{ transform: translateY(-2px); box-shadow: 0 16px 44px rgba(0,0,0,.45); }
-.tile:active{ transform: translateY(0); }
+.tile:hover{ 
+  transform: translateY(-3px); 
+  box-shadow: 0 20px 50px rgba(0,0,0,.5); 
+  border-color: var(--brand);
+}
+.tile:active{ transform: translateY(-1px); }
+
+.tile-icon{
+  position:absolute; 
+  top:-10px; right:-10px;
+  font-size:40px; 
+  opacity:0.15;
+  transform:rotate(15deg);
+  pointer-events:none;
+  z-index:1;
+}
 
 .tile-head{ display:flex; align-items:center; justify-content:space-between; }
 .tile-title{ font-weight:900; letter-spacing:.2px; font-size:18px; }
@@ -210,13 +225,80 @@ body{
 .tile-list{ margin:10px 0 0; padding-left:18px; color:var(--muted); font-size:14px; }
 .tile-list li{ margin:4px 0; }
 
-/* Удаляем (переопределяем) все цветные градиенты у отдельных плиток */
-.tile-auction,
-.tile-gifts,
-.tile-plans,
-.tile-orders,
+/* Красивые градиенты для каждого блока */
+.tile-auction{
+  background: linear-gradient(135deg, 
+    rgba(255,69,0,0.1) 0%, 
+    rgba(255,140,0,0.05) 50%, 
+    var(--panel) 100%
+  );
+}
+.tile-auction:hover{ 
+  background: linear-gradient(135deg, 
+    rgba(255,69,0,0.15) 0%, 
+    rgba(255,140,0,0.08) 50%, 
+    var(--panel) 100%
+  ); 
+}
+
+.tile-gifts{
+  background: linear-gradient(135deg, 
+    rgba(34,193,195,0.1) 0%, 
+    rgba(253,187,45,0.05) 50%, 
+    var(--panel) 100%
+  );
+}
+.tile-gifts:hover{ 
+  background: linear-gradient(135deg, 
+    rgba(34,193,195,0.15) 0%, 
+    rgba(253,187,45,0.08) 50%, 
+    var(--panel) 100%
+  ); 
+}
+
+.tile-plans{
+  background: linear-gradient(135deg, 
+    rgba(138,43,226,0.1) 0%, 
+    rgba(75,0,130,0.05) 50%, 
+    var(--panel) 100%
+  );
+}
+.tile-plans:hover{ 
+  background: linear-gradient(135deg, 
+    rgba(138,43,226,0.15) 0%, 
+    rgba(75,0,130,0.08) 50%, 
+    var(--panel) 100%
+  ); 
+}
+
+.tile-orders{
+  background: linear-gradient(135deg, 
+    rgba(0,128,0,0.1) 0%, 
+    rgba(50,205,50,0.05) 50%, 
+    var(--panel) 100%
+  );
+}
+.tile-orders:hover{ 
+  background: linear-gradient(135deg, 
+    rgba(0,128,0,0.15) 0%, 
+    rgba(50,205,50,0.08) 50%, 
+    var(--panel) 100%
+  ); 
+}
+
 .tile-create{
-  background: var(--panel) !important;
+  background: linear-gradient(135deg, 
+    rgba(123,199,255,0.1) 0%, 
+    rgba(183,163,255,0.05) 50%, 
+    var(--panel) 100%
+  );
+}
+.tile-create:hover{ 
+  background: linear-gradient(135deg, 
+    rgba(123,199,255,0.15) 0%, 
+    rgba(183,163,255,0.08) 50%, 
+    var(--panel) 100%
+  ); 
 }
 
 /* ======= SEARCH STYLES ======= */
@@ -233,6 +315,11 @@ body{
   color:var(--text); font-size:16px; font-weight:600;
 }
 .search-row .input::placeholder{ color:var(--muted); }
+
+.search-spinner{
+  font-size:18px;
+  animation: spin 1.5s linear infinite;
+}
 
 .user-list{ margin-top:24px; display:flex; flex-direction:column; gap:12px; }
 .user-row{ 
