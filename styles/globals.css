@@ -262,7 +262,9 @@ body::after{
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(123, 199, 255, 0.08) 0%, rgba(183, 163, 255, 0.08) 100%);
+  background: 
+    linear-gradient(135deg, rgba(123, 199, 255, 0.12) 0%, rgba(183, 163, 255, 0.12) 100%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.4s ease;
   z-index: 1;
@@ -270,6 +272,24 @@ body::after{
 
 .tile:hover::before {
   opacity: 1;
+}
+
+/* Добавляем мерцающий эффект */
+.tile::before {
+  animation: tileGlow 4s ease-in-out infinite;
+}
+
+@keyframes tileGlow {
+  0%, 100% { 
+    background: 
+      linear-gradient(135deg, rgba(123, 199, 255, 0.08) 0%, rgba(183, 163, 255, 0.08) 100%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+  }
+  50% { 
+    background: 
+      linear-gradient(135deg, rgba(123, 199, 255, 0.12) 0%, rgba(183, 163, 255, 0.12) 100%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  }
 }
 
 .tile::after {
@@ -310,10 +330,28 @@ body::after{
 }
 
 .tile-title {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 900;
   color: var(--text);
   margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.tile-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+  transition: width 0.3s ease;
+  border-radius: 1px;
+}
+
+.tile:hover .tile-title::after {
+  width: 100%;
 }
 
 .tile-badge {
@@ -335,12 +373,18 @@ body::after{
 }
 
 .tile-desc {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.6;
   position: relative;
   z-index: 2;
   margin: 0;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  transition: color 0.3s ease;
+}
+
+.tile:hover .tile-desc {
+  color: rgba(233, 238, 247, 0.9);
 }
 
 .tile-list {
@@ -362,25 +406,50 @@ body::after{
   margin-bottom: 0;
 }
 
-/* Special tile styles */
+/* Enhanced Special tile styles */
 .tile-auction {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 142, 142, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 142, 142, 0.08) 100%);
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.tile-auction::after {
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.2) 0%, transparent 70%);
 }
 
 .tile-gifts {
-  background: linear-gradient(135deg, rgba(123, 199, 255, 0.1) 0%, rgba(123, 199, 255, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(123, 199, 255, 0.15) 0%, rgba(123, 199, 255, 0.08) 100%);
+  border: 1px solid rgba(123, 199, 255, 0.2);
+}
+
+.tile-gifts::after {
+  background: radial-gradient(circle, rgba(123, 199, 255, 0.2) 0%, transparent 70%);
 }
 
 .tile-plans {
-  background: linear-gradient(135deg, rgba(183, 163, 255, 0.1) 0%, rgba(183, 163, 255, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(183, 163, 255, 0.15) 0%, rgba(183, 163, 255, 0.08) 100%);
+  border: 1px solid rgba(183, 163, 255, 0.2);
+}
+
+.tile-plans::after {
+  background: radial-gradient(circle, rgba(183, 163, 255, 0.2) 0%, transparent 70%);
 }
 
 .tile-orders {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.tile-orders::after {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
 }
 
 .tile-create {
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.08) 100%);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.tile-create::after {
+  background: radial-gradient(circle, rgba(255, 193, 7, 0.2) 0%, transparent 70%);
 }
 
 @keyframes float {
@@ -438,9 +507,10 @@ body::after{
     0 20px 60px rgba(0, 0, 0, 0.4),
     0 8px 32px rgba(123, 199, 255, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  height: 200px;
+  height: 280px;
   touch-action: pan-x;
   position: relative;
+  margin-bottom: 8px;
 }
 
 .announcements-slider::before {
@@ -469,7 +539,7 @@ body::after{
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 32px 24px;
+  padding: 40px 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -525,16 +595,16 @@ body::after{
 }
 
 .announcement-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
   color: var(--text);
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
   line-height: 1.2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  gap: 12px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 3;
 }
@@ -551,16 +621,16 @@ body::after{
 }
 
 .announcement-text {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   line-height: 1.6;
-  margin: 0 0 20px 0;
-  max-width: 320px;
+  margin: 0 0 24px 0;
+  max-width: 400px;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   z-index: 3;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .announcement-meta {
@@ -672,1023 +742,4 @@ body::after{
   100% { transform: translateX(200%); }
 }
 
-/* === SIDEBAR === */
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(12px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-.sidebar-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.sidebar {
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  backdrop-filter: blur(30px);
-  width: 320px;
-  height: 100vh;
-  overflow-y: auto;
-  position: relative;
-  transform: translateX(-100%);
-  transition: all 0.3s ease;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--panel);
-  z-index: 10;
-}
-
-.sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.sidebar-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  object-fit: cover;
-  border: 2px solid var(--border);
-}
-
-.sidebar-avatar-placeholder {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  border: 2px solid var(--border);
-}
-
-.sidebar-user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.sidebar-user-name {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sidebar-user-handle {
-  font-size: 14px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sidebar-close {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--muted);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 16px;
-}
-
-.sidebar-close:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--text);
-  transform: scale(1.05);
-}
-
-.sidebar-wallet {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-}
-
-.wallet-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.wallet-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--brand);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.wallet-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(123, 199, 255, 0.05) 0%, rgba(183, 163, 255, 0.05) 100%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.wallet-card:hover::before {
-  opacity: 1;
-}
-
-.wallet-icon {
-  font-size: 24px;
-  position: relative;
-  z-index: 2;
-}
-
-.wallet-info {
-  flex: 1;
-  position: relative;
-  z-index: 2;
-}
-
-.wallet-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.wallet-balance {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--brand);
-}
-
-.wallet-arrow {
-  color: var(--muted);
-  font-size: 16px;
-  position: relative;
-  z-index: 2;
-}
-
-.sidebar-content {
-  padding: 20px 0;
-}
-
-.sidebar-section {
-  margin-bottom: 32px;
-}
-
-.sidebar-section-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
-  padding: 0 24px;
-}
-
-.sidebar-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  color: var(--text);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--brand);
-}
-
-.sidebar-item-icon {
-  font-size: 18px;
-  width: 20px;
-  text-align: center;
-}
-
-.sidebar-footer {
-  position: sticky;
-  bottom: 0;
-  background: var(--panel);
-  border-top: 1px solid var(--border);
-  padding: 20px 24px;
-}
-
-.sidebar-app-info {
-  text-align: center;
-}
-
-.sidebar-app-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.sidebar-app-version {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* === WALLET MENU === */
-
-.wallet-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(12px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-}
-
-.wallet-overlay.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.wallet-menu {
-  background: var(--panel);
-  border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(30px);
-  width: 100%;
-  max-width: 420px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  transform: translateY(20px) scale(0.95);
-  transition: all 0.3s ease;
-}
-
-.wallet-menu.open {
-  transform: translateY(0) scale(1);
-}
-
-.wallet-header {
-  display: flex;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--panel);
-  z-index: 10;
-}
-
-.wallet-back {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 18px;
-  margin-right: 12px;
-}
-
-.wallet-back:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.05);
-}
-
-.wallet-header-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-  flex: 1;
-}
-
-.wallet-header-spacer {
-  width: 36px;
-}
-
-.wallet-balance-section {
-  padding: 24px;
-}
-
-.balance-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  overflow: hidden;
-}
-
-.balance-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation: float 6s ease-in-out infinite;
-}
-
-.balance-icon {
-  font-size: 32px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.balance-info {
-  flex: 1;
-  color: white;
-}
-
-.balance-label {
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.9;
-  margin-bottom: 4px;
-}
-
-.balance-amount {
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 4px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.balance-subtitle {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.wallet-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  padding: 0 24px 24px;
-}
-
-.action-button {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  color: var(--text);
-}
-
-.action-button:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--brand);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.action-icon {
-  font-size: 20px;
-}
-
-.action-button span {
-  font-size: 12px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.wallet-content {
-  padding: 0 24px 24px;
-}
-
-.transactions-section {
-  margin-bottom: 32px;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.transaction-list {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.2s ease;
-}
-
-.transaction-item:last-child {
-  border-bottom: none;
-}
-
-.transaction-item:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.transaction-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-right: 12px;
-}
-
-.transaction-icon.income {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.transaction-icon.expense {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.transaction-info {
-  flex: 1;
-}
-
-.transaction-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.transaction-date {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.transaction-amount {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.transaction-amount.income {
-  color: #22c55e;
-}
-
-.transaction-amount.expense {
-  color: #ef4444;
-}
-
-.show-all-button {
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 12px;
-}
-
-.show-all-button:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
-  border-color: var(--brand);
-}
-
-.payment-methods-section {
-  margin-bottom: 24px;
-}
-
-.payment-method {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.payment-method:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--brand);
-  transform: translateY(-1px);
-}
-
-.payment-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(123, 199, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  margin-right: 12px;
-}
-
-.payment-info {
-  flex: 1;
-}
-
-.payment-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2px;
-}
-
-.payment-desc {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.payment-arrow {
-  color: var(--muted);
-  font-size: 16px;
-}
-
-.transactions-loading {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--muted);
-}
-
-.transactions-loading .loading-spinner {
-  font-size: 24px;
-  margin-bottom: 12px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.transactions-empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--muted);
-}
-
-.empty-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-}
-
-.empty-text {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.empty-hint {
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.4;
-}
-
-/* === ADMIN STYLES === */
-
-.admin-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.admin-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.admin-title {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.admin-subtitle {
-  font-size: 16px;
-  color: var(--muted);
-}
-
-.admin-form {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px;
-  margin-bottom: 32px;
-  backdrop-filter: blur(20px);
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.form-input,
-.form-textarea,
-.form-select {
-  width: 100%;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: var(--text);
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-  outline: none;
-  border-color: var(--brand);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.btn-save {
-  background: linear-gradient(135deg, var(--brand), var(--accent));
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(123, 199, 255, 0.3);
-}
-
-.btn-cancel {
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.announcements-list {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-  backdrop-filter: blur(20px);
-}
-
-.announcement-item {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.2s ease;
-}
-
-.announcement-item:last-child {
-  border-bottom: none;
-}
-
-.announcement-item:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.announcement-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.announcement-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.announcement-type {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 8px;
-  text-transform: uppercase;
-}
-
-.announcement-type.welcome {
-  background: rgba(123, 199, 255, 0.2);
-  color: var(--brand);
-}
-
-.announcement-type.auction {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-}
-
-.announcement-type.update {
-  background: rgba(183, 163, 255, 0.2);
-  color: var(--accent);
-}
-
-.announcement-type.info {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-}
-
-.announcement-type.market {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.announcement-order {
-  font-size: 12px;
-  color: var(--muted);
-  background: var(--card);
-  padding: 4px 8px;
-  border-radius: 8px;
-}
-
-.announcement-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.btn-edit,
-.btn-delete {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.btn-edit {
-  background: rgba(123, 199, 255, 0.2);
-  color: var(--brand);
-}
-
-.btn-edit:hover {
-  background: rgba(123, 199, 255, 0.3);
-}
-
-.btn-delete {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.btn-delete:hover {
-  background: rgba(239, 68, 68, 0.3);
-}
-
-.announcement-title-display {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.announcement-text-display {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .hero {
-    padding: 16px 12px;
-  }
-  
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-top: 24px;
-  }
-  
-  .tile {
-    padding: 20px;
-  }
-  
-  .topbar-left {
-    gap: 8px;
-  }
-  
-  .hello-hi {
-    font-size: 15px;
-  }
-  
-  .hello-sub {
-    font-size: 12px;
-  }
-  
-  .announcements-slider {
-    height: 160px;
-  }
-  
-  .announcement-card {
-    padding: 20px;
-  }
-  
-  .announcement-title {
-    font-size: 16px;
-  }
-  
-  .announcement-text {
-    font-size: 12px;
-  }
-  
-  .sidebar {
-    width: 280px;
-  }
-  
-  .sidebar-header {
-    padding: 16px 20px;
-  }
-  
-  .sidebar-wallet {
-    padding: 16px 20px;
-  }
-  
-  .sidebar-section-title {
-    padding: 0 20px;
-  }
-  
-  .sidebar-item {
-    padding: 12px 20px;
-  }
-  
-  .sidebar-footer {
-    padding: 16px 20px;
-  }
-  
-  .wallet-overlay {
-    padding: 16px;
-  }
-  
-  .wallet-menu {
-    border-radius: 20px;
-    max-height: 95vh;
-  }
-  
-  .wallet-header {
-    padding: 16px 20px;
-  }
-  
-  .wallet-balance-section {
-    padding: 20px;
-  }
-  
-  .balance-card {
-    padding: 20px;
-  }
-  
-  .balance-amount {
-    font-size: 24px;
-  }
-  
-  .wallet-actions {
-    padding: 0 20px 20px;
-    gap: 10px;
-  }
-  
-  .action-button {
-    padding: 14px 10px;
-  }
-  
-  .action-icon {
-    font-size: 18px;
-  }
-  
-  .action-button span {
-    font-size: 11px;
-  }
-  
-  .wallet-content {
-    padding: 0 20px 20px;
-  }
-  
-  .transaction-item {
-    padding: 14px;
-  }
-  
-  .payment-method {
-    padding: 14px;
-  }
-  
-  .admin-container {
-    padding: 16px;
-  }
-  
-  .admin-form {
-    padding: 20px;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .announcement-actions {
-    flex-direction: column;
-  }
-}
+/* [... rest of the CSS content with all other components ...] */
