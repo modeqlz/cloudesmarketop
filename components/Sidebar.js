@@ -8,7 +8,7 @@ export default function Sidebar({ isOpen, onClose, user }) {
     if (isOpen) {
       setIsVisible(true);
     } else {
-      const timeout = setTimeout(() => setIsVisible(false), 300);
+      const timeout = setTimeout(() => setIsVisible(false), 200);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
