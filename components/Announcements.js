@@ -299,20 +299,16 @@ export default function Announcements() {
         </div>
       </div>
       
-      {/* Полоска прогресса */}
-      <div className="announcements-progress">
-        <div className="progress-info">
-          <span className="progress-text">{currentIndex + 1} из {announcements.length}</span>
-          <span className="progress-percentage">{Math.round(((currentIndex + 1) / announcements.length) * 100)}%</span>
-        </div>
-        <div className="progress-bar">
-          <div 
-            className="progress-fill"
-            style={{
-              width: `${((currentIndex + 1) / announcements.length) * 100}%`
-            }}
+      {/* Точки навигации */}
+      <div className="announcements-dots">
+        {announcements.map((_, index) => (
+          <button
+            key={index}
+            className={`announcement-dot ${index === currentIndex ? 'active' : ''}`}
+            onClick={() => goToSlide(index)}
+            aria-label={`Перейти к объявлению ${index + 1}`}
           />
-        </div>
+        ))}
       </div>
     </div>
   );
