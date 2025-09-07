@@ -1,95 +1,110 @@
 // pages/api/wallet/transactions.js
-import { supabaseAdmin } from '../../../lib/supabase';
-import { verifyTelegramAuth } from '../../../lib/verifyTelegramAuth';
+import { supabaseServer } from '../../../lib/supabaseServer'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    // Проверяем авторизацию Telegram
-    const user = verifyTelegramAuth(req.query);
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    const { telegram_id, limit = 20, offset = 0 } = req.query
+
+    if (!telegram_id) {
+      return res.status(400).json({ error: 'telegram_id is required' })
     }
 
-    const { limit = 10, offset = 0 } = req.query;
-
     // Получаем транзакции пользователя
-    const { data: transactions, error } = await supabaseAdmin
-      .from('transactions')
+    const { data: transactions, error } = await supabaseServer
+      .from('wallet_tx')
       .select(`
-        id, type, amount, currency, status, payment_method,
-        description, created_at, updated_at
+        id,
+        amount_cents,
+        kind,
+        provider,
+        status,
+        description,
+        stripe_session_id,
+        created_at
       `)
-      .eq('user_id', user.id)
+      .eq('telegram_id', telegram_id)
       .order('created_at', { ascending: false })
-      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
+      .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1)
 
     if (error) {
-      console.error('Error fetching transactions:', error);
-      return res.status(500).json({ error: 'Failed to fetch transactions' });
+      console.error('Error fetching transactions:', error)
+      return res.status(500).json({ error: 'Failed to fetch transactions' })
     }
 
     // Форматируем транзакции для фронтенда
     const formattedTransactions = transactions.map(transaction => {
-      let icon = '+';
-      let className = 'income';
+      let icon = '+'
+      let className = 'income'
+      let title = transaction.description || getTransactionTitle(transaction.kind)
       
-      if (transaction.type === 'withdrawal' || transaction.type === 'transfer_out' || transaction.type === 'purchase') {
-        icon = '-';
-        className = 'expense';
-      } else if (transaction.type === 'transfer_in' || transaction.type === 'transfer_out') {
-        icon = '⇄';
-        className = 'transfer';
+      if (transaction.kind === 'withdrawal' || transaction.kind === 'purchase') {
+        icon = '-'
+        className = 'expense'
+      } else if (transaction.kind === 'transfer_in' || transaction.kind === 'transfer_out') {
+        icon = '⇄'
+        className = 'transfer'
       }
 
       return {
         id: transaction.id,
         icon,
         className,
-        title: transaction.description || getTransactionTitle(transaction.type),
+        title,
+        amount_cents: transaction.amount_cents,
+        amount_usd: transaction.amount_cents / 100,
+        amount_display: `${icon === '-' ? '-' : '+'}$${(transaction.amount_cents / 100).toFixed(2)}`,
+        provider: transaction.provider,
+        status: transaction.status,
         date: formatDate(transaction.created_at),
-        amount: `${icon === '-' ? '-' : '+'}${transaction.amount.toLocaleString('ru-RU')} ₽`,
-        status: transaction.status
-      };
-    });
+        created_at: transaction.created_at
+      }
+    })
 
     res.status(200).json({
       transactions: formattedTransactions,
-      hasMore: transactions.length === parseInt(limit)
-    });
+      has_more: transactions.length === parseInt(limit)
+    })
 
   } catch (error) {
-    console.error('Transactions API error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Transactions API error:', error)
+    res.status(500).json({ error: 'Internal server error' })
   }
 }
 
-function getTransactionTitle(type) {
+function getTransactionTitle(kind) {
   const titles = {
-    'deposit': 'Пополнение баланса',
-    'withdrawal': 'Вывод средств',
-    'transfer_in': 'Входящий перевод',
-    'transfer_out': 'Исходящий перевод',
-    'purchase': 'Покупка',
-    'refund': 'Возврат средств'
-  };
-  return titles[type] || 'Операция';
+    'topup': 'Wallet Top-up',
+    'withdrawal': 'Withdrawal',
+    'purchase': 'Purchase',
+    'refund': 'Refund',
+    'transfer_in': 'Transfer In',
+    'transfer_out': 'Transfer Out'
+  }
+  return titles[kind] || 'Transaction'
 }
 
 function formatDate(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now - date
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays === 0) {
-    return `Сегодня, ${date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+    return `Today, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
   } else if (diffDays === 1) {
-    return `Вчера, ${date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+    return `Yesterday, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+  } else if (diffDays < 7) {
+    return `${diffDays} days ago`
   } else {
-    return `${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}, ${date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 }

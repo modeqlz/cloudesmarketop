@@ -5,9 +5,10 @@ interface TopUpModalProps {
   isOpen: boolean
   onClose: () => void
   userId: number
+  onSuccess?: () => void
 }
 
-export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps) {
+export default function TopUpModal({ isOpen, onClose, userId, onSuccess }: TopUpModalProps) {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -94,6 +95,9 @@ export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps)
         window.open(data.url, '_blank')
       }
 
+      // Вызываем callback успеха
+      onSuccess && onSuccess()
+      
       // Закрываем модал
       onClose()
     } catch (err) {
