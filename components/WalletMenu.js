@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import TopUpModal from './TopUpModal';
 
-export default function WalletMenu({ isOpen, onClose, user }) {
+export default function WalletMenu({ isOpen, onClose, user, onBalanceUpdate }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [balance, setBalance] = useState(0);
@@ -200,6 +200,8 @@ export default function WalletMenu({ isOpen, onClose, user }) {
         onSuccess={() => {
           // Обновляем данные после успешного пополнения
           loadWalletData();
+          // Обновляем баланс в сайдбаре
+          onBalanceUpdate && onBalanceUpdate();
         }}
       />
     </div>

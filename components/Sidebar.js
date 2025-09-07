@@ -5,16 +5,35 @@ import WalletMenu from './WalletMenu';
 export default function Sidebar({ isOpen, onClose, user }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [balanceLoading, setBalanceLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      loadWalletBalance(); // Загружаем баланс при открытии сайдбара
     } else {
       setIsWalletOpen(false); // Закрываем кошелек при закрытии сайдбара
       const timeout = setTimeout(() => setIsVisible(false), 200);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
+
+  const loadWalletBalance = async () => {
+    if (!user?.id) return;
+    
+    setBalanceLoading(true);
+    try {
+      const response = await fetch(`/api/wallet/balance?telegram_id=${user.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setWalletBalance(data.balance_usd || 0);
+      }
+    } catch (error) {
+      console.error('Error loading wallet balance:', error);
+    }
+    setBalanceLoading(false);
+  };
 
   // Закрытие по клику на backdrop
   const handleBackdropClick = (e) => {
@@ -25,28 +44,33 @@ export default function Sidebar({ isOpen, onClose, user }) {
 
   if (!isVisible) return null;
 
-  const avatar = user?.photo_url || null;
-  const name = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Гость';
-  const username = user?.username ? `@${user.username}` : '';
-  const initial = name.charAt(0).toUpperCase();
-
   return (
     <div 
-      className={`sidebar-overlay ${isOpen ? 'open' : ''}`} 
+      className={`sidebar-overlay ${isOpen ? 'open' : ''}`}
       onClick={handleBackdropClick}
     >
       <div className={`sidebar ${isOpen ? 'open' : ''}`}>
         {/* Заголовок с пользователем */}
         <div className="sidebar-header">
           <div className="sidebar-user">
-            {avatar ? (
-              <img src={avatar} alt="User Avatar" className="sidebar-avatar" />
+            {user?.photo_url ? (
+              <img 
+                src={user.photo_url} 
+                alt={user.first_name}
+                className="sidebar-avatar"
+              />
             ) : (
-              <div className="sidebar-avatar-placeholder">{initial}</div>
+              <div className="sidebar-avatar-placeholder">
+                {user?.first_name?.charAt(0) || '👤'}
+              </div>
             )}
             <div className="sidebar-user-info">
-              <div className="sidebar-user-name">{name}</div>
-              {username && <div className="sidebar-user-handle">{username}</div>}
+              <div className="sidebar-user-name">
+                {user?.first_name} {user?.last_name || ''}
+              </div>
+              <div className="sidebar-user-handle">
+                @{user?.username || 'пользователь'}
+              </div>
             </div>
           </div>
           
@@ -61,7 +85,9 @@ export default function Sidebar({ isOpen, onClose, user }) {
             <div className="wallet-icon">💳</div>
             <div className="wallet-info">
               <div className="wallet-title">Мой кошелек</div>
-              <div className="wallet-balance">1,250 ₽</div>
+              <div className="wallet-balance">
+                {balanceLoading ? '⏳' : `$${walletBalance.toFixed(2)}`}
+              </div>
             </div>
             <div className="wallet-arrow">→</div>
           </div>
@@ -77,40 +103,40 @@ export default function Sidebar({ isOpen, onClose, user }) {
             </a>
             <a href="/search" className="sidebar-item">
               <span className="sidebar-item-icon">🔍</span>
-              <span>Найти игрока</span>
+              <span>Найти игроков</span>
             </a>
           </div>
 
           <div className="sidebar-section">
             <div className="sidebar-section-title">💰 Маркет</div>
-            <a href="/market" className="sidebar-item">
-              <span className="sidebar-item-icon">🛒</span>
-              <span>Скины</span>
+            <a href="#" className="sidebar-item">
+              <span className="sidebar-item-icon">🏪</span>
+              <span>Скины и предметы</span>
             </a>
-            <a href="/auctions" className="sidebar-item">
-              <span className="sidebar-item-icon">🔥</span>
+            <a href="#" className="sidebar-item">
+              <span className="sidebar-item-icon">🎯</span>
               <span>Аукционы</span>
             </a>
-            <a href="/inventory" className="sidebar-item">
-              <span className="sidebar-item-icon">🎒</span>
+            <a href="#" className="sidebar-item">
+              <span className="sidebar-item-icon">📦</span>
               <span>Мои заказы</span>
             </a>
           </div>
 
           <div className="sidebar-section">
             <div className="sidebar-section-title">⚙️ Настройки</div>
-            <a href="/plans" className="sidebar-item">
-              <span className="sidebar-item-icon">💎</span>
+            <a href="#" className="sidebar-item">
+              <span className="sidebar-item-icon">🌟</span>
               <span>Премиум</span>
             </a>
-            <a href="/support" className="sidebar-item">
+            <a href="#" className="sidebar-item">
               <span className="sidebar-item-icon">💬</span>
               <span>Поддержка</span>
             </a>
           </div>
         </div>
 
-        {/* Подвал */}
+        {/* Футер */}
         <div className="sidebar-footer">
           <div className="sidebar-app-info">
             <div className="sidebar-app-name">Cloudes Market</div>
@@ -124,6 +150,7 @@ export default function Sidebar({ isOpen, onClose, user }) {
         isOpen={isWalletOpen}
         onClose={() => setIsWalletOpen(false)}
         user={user}
+        onBalanceUpdate={loadWalletBalance}
       />
     </div>
   );
