@@ -1,6 +1,5 @@
 // components/Announcements.js
 import { useState, useEffect } from 'react';
-import '../styles/announcements.css';
 
 export default function Announcements() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -199,8 +198,8 @@ export default function Announcements() {
           <div className="announcements-title">📢 Объявления</div>
           <div className="announcements-counter">Загрузка...</div>
         </div>
-        <div className="announcements-slider">
-          <div className="announcements-loading">Загружаем объявления...</div>
+        <div className="announcements-slider" style={{height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <div style={{color: 'var(--muted)', fontSize: 14}}>⏳ Загружаем объявления...</div>
         </div>
       </div>
     );
@@ -214,8 +213,8 @@ export default function Announcements() {
           <div className="announcements-title">📢 Объявления</div>
           <div className="announcements-counter">0 / 0</div>
         </div>
-        <div className="announcements-slider">
-          <div className="announcements-empty">📭 Объявлений пока нет</div>
+        <div className="announcements-slider" style={{height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <div style={{color: 'var(--muted)', fontSize: 14}}>📭 Объявлений пока нет</div>
         </div>
       </div>
     );
@@ -260,23 +259,14 @@ export default function Announcements() {
                 onClick={() => isActive && handleAnnouncementClick(announcement)}
               >
                 <div className="announcement-content">
-                  <div className="announcement-type-badge">
-                    {announcement.type === 'welcome' && 'ДОБРО ПОЖАЛОВАТЬ'}
-                    {announcement.type === 'auction' && 'АУКЦИОН'}
-                    {announcement.type === 'update' && 'ОБНОВЛЕНИЕ'}
-                    {announcement.type === 'market' && 'МАРКЕТ'}
-                    {announcement.type === 'info' && 'ИНФОРМАЦИЯ'}
-                  </div>
-                  
+                  <div className="announcement-type-badge">{announcement.type}</div>
                   <h3 className="announcement-title">
                     {announcement.title}
                     {announcement.telegram_link && (
                       <span className="clickable-hint">👆</span>
                     )}
                   </h3>
-                  
                   <p className="announcement-text">{announcement.text}</p>
-                  
                   <div className="announcement-meta">
                     <div className="announcement-date">
                       {new Date(announcement.created_at).toLocaleDateString('ru-RU', {
@@ -290,18 +280,6 @@ export default function Announcements() {
                       </div>
                     )}
                   </div>
-                  
-                  {announcement.telegram_link && (
-                    <button 
-                      className="announcement-cta"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAnnouncementClick(announcement);
-                      }}
-                    >
-                      Подробнее
-                    </button>
-                  )}
                 </div>
                 
                 {/* Декоративный градиент */}
