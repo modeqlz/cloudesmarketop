@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 
 export default function WalletMenu({ isOpen, onClose, user }) {
   const [isVisible, setIsVisible] = useState(false);
-  const [balance, setBalance] = useState(1250);
 
   useEffect(() => {
     if (isOpen) {
@@ -61,7 +60,7 @@ export default function WalletMenu({ isOpen, onClose, user }) {
             <div className="balance-icon">💳</div>
             <div className="balance-info">
               <div className="balance-label">Общий баланс</div>
-              <div className="balance-amount">{balance.toLocaleString('ru-RU')} ₽</div>
+              <div className="balance-amount">1,250 ₽</div>
               <div className="balance-subtitle">Доступно для покупок</div>
             </div>
           </div>
@@ -69,15 +68,15 @@ export default function WalletMenu({ isOpen, onClose, user }) {
 
         {/* Быстрые действия */}
         <div className="wallet-actions">
-          <div className="action-button">
+          <div className="action-button" onClick={() => alert('Функция в разработке')}>
             <div className="action-icon">📥</div>
             <span>Пополнить</span>
           </div>
-          <div className="action-button">
+          <div className="action-button" onClick={() => alert('Функция в разработке')}>
             <div className="action-icon">📤</div>
             <span>Вывести</span>
           </div>
-          <div className="action-button">
+          <div className="action-button" onClick={() => alert('Функция в разработке')}>
             <div className="action-icon">💸</div>
             <span>Перевод</span>
           </div>
@@ -101,7 +100,7 @@ export default function WalletMenu({ isOpen, onClose, user }) {
               <div className="transaction-item">
                 <div className="transaction-icon expense">-</div>
                 <div className="transaction-info">
-                  <div className="transaction-title">Покупка скина AK-47</div>
+                  <div className="transaction-title">Покупка скина</div>
                   <div className="transaction-date">Вчера, 18:45</div>
                 </div>
                 <div className="transaction-amount expense">-1,200 ₽</div>
@@ -111,18 +110,9 @@ export default function WalletMenu({ isOpen, onClose, user }) {
                 <div className="transaction-icon income">+</div>
                 <div className="transaction-info">
                   <div className="transaction-title">Продажа предмета</div>
-                  <div className="transaction-date">25 дек, 12:15</div>
+                  <div className="transaction-date">2 дня назад, 12:15</div>
                 </div>
                 <div className="transaction-amount income">+850 ₽</div>
-              </div>
-
-              <div className="transaction-item">
-                <div className="transaction-icon transfer">⇄</div>
-                <div className="transaction-info">
-                  <div className="transaction-title">Перевод пользователю</div>
-                  <div className="transaction-date">23 дек, 09:20</div>
-                </div>
-                <div className="transaction-amount transfer">-300 ₽</div>
               </div>
             </div>
 
@@ -164,6 +154,7 @@ export default function WalletMenu({ isOpen, onClose, user }) {
           </div>
         </div>
       </div>
+
     </div>
   );
 }
