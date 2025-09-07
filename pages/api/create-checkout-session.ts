@@ -33,9 +33,11 @@ export default async function handler(
     }
 
     // Создаем Stripe Checkout Session
+    // ВАЖНО: Этот session.url будет открыт во внешнем браузере через Telegram WebApp
+    // где Google Pay будет доступен автоматически
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card'], // Google Pay включается автоматически для card
       line_items: [
         {
           price_data: {
@@ -55,15 +57,20 @@ export default async function handler(
       metadata: {
         userId: String(userId),
         kind: 'wallet_topup',
+        source: 'telegram_webapp', // Помечаем что запрос из Telegram WebApp
       },
-      // Включаем Google Pay и Apple Pay
+      // Настройки для лучшей поддержки Google Pay
       payment_method_options: {
         card: {
           request_three_d_secure: 'automatic',
         },
       },
-      // Автоматически включает Google Pay если доступен
+      // Отключаем автоматические налоги
       automatic_tax: { enabled: false },
+      // Настройки для мобильных устройств
+      phone_number_collection: {
+        enabled: false,
+      },
     })
 
     res.status(200).json({ url: session.url })

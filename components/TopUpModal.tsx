@@ -84,8 +84,10 @@ export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps)
         throw new Error(data.error || 'Failed to create checkout session')
       }
 
-      // Открываем Stripe Checkout в внешнем браузере для поддержки Google Pay
+      // ВАЖНО: Всегда открываем Stripe Checkout во внешнем браузере
+      // Это необходимо для поддержки Google Pay, который не работает в WebView
       if (window.Telegram?.WebApp) {
+        // Открываем во внешнем браузере (Chrome/Android) где доступен Google Pay
         window.Telegram.WebApp.openLink(data.url, { try_instant_view: false })
       } else {
         // Fallback для тестирования в обычном браузере
@@ -96,7 +98,15 @@ export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps)
       onClose()
     } catch (err) {
       console.error('Payment error:', err)
-      setError(err instanceof Error ? err.message : 'Payment failed')
+      const errorMessage = err instanceof Error ? err.message : 'Payment failed'
+      
+      // Показываем ошибку пользователю
+      setError(errorMessage)
+      
+      // Также показываем toast в Telegram WebApp если доступен
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert(`Ошибка: ${errorMessage}`)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -182,14 +192,14 @@ export default function TopUpModal({ isOpen, onClose, userId }: TopUpModalProps)
               </>
             ) : (
               <>
-                🚀 Pay with Google Pay / Card
+                💳 Open Payment Page
                 {getAmountInCents() && ` ($${(getAmountInCents()! / 100).toFixed(2)})`}
               </>
             )}
           </button>
 
           <p className="payment-note">
-            💡 Secure payment via Stripe. Supports Google Pay, Apple Pay, and all major cards.
+            💡 Payment will open in your browser where Google Pay and all cards are supported.
           </p>
         </div>
       </div>
