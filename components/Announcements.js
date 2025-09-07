@@ -36,6 +36,8 @@ const announcementsData = [
 export default function Announcements() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   // Автопрокрутка каждые 5 секунд
   useEffect(() => {
@@ -62,6 +64,32 @@ export default function Announcements() {
     goToSlide((currentIndex - 1 + announcementsData.length) % announcementsData.length);
   };
 
+  // Обработка свайпов
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide(); // Свайп влево - следующий слайд
+    } else if (isRightSwipe) {
+      prevSlide(); // Свайп вправо - предыдущий слайд
+    }
+  };
+
   const getTypeColor = (type) => {
     switch(type) {
       case 'welcome': return 'rgba(123,199,255,0.6)';
@@ -83,7 +111,12 @@ export default function Announcements() {
         </div>
       </div>
       
-      <div className="announcements-slider">
+      <div 
+        className="announcements-slider"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <div 
           className="announcement-card"
           style={{'--type-color': getTypeColor(currentAnnouncement.type)}}
@@ -94,22 +127,6 @@ export default function Announcements() {
             <div className="announcement-date">{currentAnnouncement.date}</div>
           </div>
         </div>
-        
-        {/* Навигационные кнопки */}
-        <button 
-          className="nav-btn nav-btn-prev" 
-          onClick={prevSlide}
-          aria-label="Предыдущее объявление"
-        >
-          ‹
-        </button>
-        <button 
-          className="nav-btn nav-btn-next" 
-          onClick={nextSlide}
-          aria-label="Следующее объявление"
-        >
-          ›
-        </button>
       </div>
       
       {/* Индикаторы точек */}

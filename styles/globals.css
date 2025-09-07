@@ -427,6 +427,13 @@ body::after{
   position: relative;
   height: 120px;
   overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-x;
+}
+
+.announcements-slider:active{
+  cursor: grabbing;
 }
 
 .announcement-card{
@@ -470,39 +477,7 @@ body::after{
   opacity: 0.7;
 }
 
-.nav-btn{
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: var(--text);
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  transition: all 0.2s ease;
-  z-index: 2;
-}
-
-.nav-btn:hover{
-  background: rgba(255,255,255,0.2);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.nav-btn-prev{
-  left: 10px;
-}
-
-.nav-btn-next{
-  right: 10px;
-}
+/* Убрали кнопки навигации - теперь только свайпы */
 
 .announcements-dots{
   display: flex;
@@ -550,11 +525,5 @@ body::after{
   
   .announcement-text{
     font-size: 12px;
-  }
-  
-  .nav-btn{
-    width: 28px;
-    height: 28px;
-    font-size: 16px;
   }
 }
