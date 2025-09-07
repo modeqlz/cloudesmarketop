@@ -206,9 +206,9 @@ body{
 
 .tile-icon{
   position:absolute; 
-  top:-10px; right:-10px;
-  font-size:40px; 
-  opacity:0.15;
+  bottom:8px; right:8px;
+  font-size:32px; 
+  opacity:0.2;
   transform:rotate(15deg);
   pointer-events:none;
   z-index:1;
@@ -228,76 +228,76 @@ body{
 /* Красивые градиенты для каждого блока */
 .tile-auction{
   background: linear-gradient(135deg, 
-    rgba(255,69,0,0.1) 0%, 
+    var(--panel) 0%, 
     rgba(255,140,0,0.05) 50%, 
-    var(--panel) 100%
+    rgba(255,69,0,0.1) 100%
   );
 }
 .tile-auction:hover{ 
   background: linear-gradient(135deg, 
-    rgba(255,69,0,0.15) 0%, 
+    var(--panel) 0%, 
     rgba(255,140,0,0.08) 50%, 
-    var(--panel) 100%
+    rgba(255,69,0,0.15) 100%
   ); 
 }
 
 .tile-gifts{
   background: linear-gradient(135deg, 
-    rgba(34,193,195,0.1) 0%, 
+    var(--panel) 0%, 
     rgba(253,187,45,0.05) 50%, 
-    var(--panel) 100%
+    rgba(34,193,195,0.1) 100%
   );
 }
 .tile-gifts:hover{ 
   background: linear-gradient(135deg, 
-    rgba(34,193,195,0.15) 0%, 
+    var(--panel) 0%, 
     rgba(253,187,45,0.08) 50%, 
-    var(--panel) 100%
+    rgba(34,193,195,0.15) 100%
   ); 
 }
 
 .tile-plans{
   background: linear-gradient(135deg, 
-    rgba(138,43,226,0.1) 0%, 
+    var(--panel) 0%, 
     rgba(75,0,130,0.05) 50%, 
-    var(--panel) 100%
+    rgba(138,43,226,0.1) 100%
   );
 }
 .tile-plans:hover{ 
   background: linear-gradient(135deg, 
-    rgba(138,43,226,0.15) 0%, 
+    var(--panel) 0%, 
     rgba(75,0,130,0.08) 50%, 
-    var(--panel) 100%
+    rgba(138,43,226,0.15) 100%
   ); 
 }
 
 .tile-orders{
   background: linear-gradient(135deg, 
-    rgba(0,128,0,0.1) 0%, 
+    var(--panel) 0%, 
     rgba(50,205,50,0.05) 50%, 
-    var(--panel) 100%
+    rgba(0,128,0,0.1) 100%
   );
 }
 .tile-orders:hover{ 
   background: linear-gradient(135deg, 
-    rgba(0,128,0,0.15) 0%, 
+    var(--panel) 0%, 
     rgba(50,205,50,0.08) 50%, 
-    var(--panel) 100%
+    rgba(0,128,0,0.15) 100%
   ); 
 }
 
 .tile-create{
   background: linear-gradient(135deg, 
-    rgba(123,199,255,0.1) 0%, 
+    var(--panel) 0%, 
     rgba(183,163,255,0.05) 50%, 
-    var(--panel) 100%
+    rgba(123,199,255,0.1) 100%
   );
 }
 .tile-create:hover{ 
   background: linear-gradient(135deg, 
-    rgba(123,199,255,0.15) 0%, 
+    var(--panel) 0%, 
     rgba(183,163,255,0.08) 50%, 
-    var(--panel) 100%
+    rgba(123,199,255,0.15) 100%
   ); 
 }
 
