@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Head from 'next/head';
 import { useAuth } from '../lib/useAuth';
-import Announcements from '../components/Announcements';
+import AnnouncementBoard from '../components/AnnouncementBoard';
 import Sidebar from '../components/Sidebar';
 import useSidebar from '../lib/useSidebar';
 
@@ -74,7 +74,7 @@ export default function HomePage() {
           </div>
 
           {/* Announcements */}
-          <Announcements />
+          <AnnouncementBoard />
 
           {/* grid tiles */}
           <div className="grid">
