@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import styles from '../styles/announcementBoard.css';
+import '../styles/announcementBoard.css';
 
 const AnnouncementBoard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
