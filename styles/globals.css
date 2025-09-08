@@ -109,7 +109,7 @@ body::after {
   100% { transform: translate(20px, 20px); }
 }
 
-.container{ min-height:100vh; width: 100%; padding: 0; margin: 0; }
+.container{ min-height:100vh; width: 100%; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; }
 
 /* === LOGIN PAGE STYLES === */
 .login-container {
