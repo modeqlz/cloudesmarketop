@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from '../lib/supabase';
 import styles from '../styles/AnnouncementBoardNew.module.css';
 
 const AnnouncementBoardNew = () => {
@@ -16,16 +17,26 @@ const AnnouncementBoardNew = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Загрузка объявлений из API
+  // Загрузка объявлений из Supabase с подпиской на изменения в реальном времени
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const response = await fetch('/api/announcements');
-        const data = await response.json();
-        
-        if (data.ok && data.announcements) {
+        // Загружаем объявления напрямую из Supabase
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Ошибка загрузки объявлений:', error);
+          throw error;
+        }
+
+        if (data && data.length > 0) {
           // Преобразуем данные из Supabase в нужный формат
-          const formattedAnnouncements = data.announcements.map(announcement => ({
+          const formattedAnnouncements = data.map(announcement => ({
             id: announcement.id,
             type: announcement.type.toUpperCase(),
             title: announcement.type.toUpperCase(),
@@ -37,6 +48,20 @@ const AnnouncementBoardNew = () => {
             background: getBackgroundByType(announcement.type)
           }));
           setAnnouncements(formattedAnnouncements);
+        } else {
+          // Fallback к статическим данным если нет объявлений в БД
+          setAnnouncements([
+            {
+              id: 1,
+              type: 'MARKET',
+              title: 'MARKET',
+              subtitle: 'Маркет работает 24/7',
+              description: 'Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры.',
+              action: 'Подробнее',
+              icon: '📦',
+              background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'
+            }
+          ]);
         }
       } catch (error) {
         console.error('Ошибка загрузки объявлений:', error);
@@ -58,7 +83,35 @@ const AnnouncementBoardNew = () => {
       }
     };
 
+    // Загружаем объявления при монтировании
     fetchAnnouncements();
+
+    // Подписываемся на изменения в реальном времени
+    const subscription = supabase
+      .channel('announcements-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Слушаем все события: INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'announcements'
+        },
+        (payload) => {
+          console.log('🔄 Изменение в объявлениях:', payload);
+          
+          // Перезагружаем объявления при любом изменении
+          fetchAnnouncements();
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Статус подписки на объявления:', status);
+      });
+
+    // Очистка подписки при размонтировании
+    return () => {
+      console.log('🔌 Отключение подписки на объявления');
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Функция для получения иконки по типу
