@@ -193,9 +193,6 @@ const AnnouncementBoardCompact = () => {
     <div className={styles.announcementBoardCompact}>
       <div className={styles.header}>
         <h3 className={styles.title}>📢 Объявления</h3>
-        <div className={styles.counter}>
-          {currentIndex + 1} / {announcements.length}
-        </div>
       </div>
 
       <div 
@@ -238,43 +235,10 @@ const AnnouncementBoardCompact = () => {
           </div>
         </div>
 
-        {/* Навигационные кнопки */}
-        {announcements.length > 1 && (
-          <>
-            <button 
-              className={`${styles.navButton} ${styles.prevButton}`}
-              onClick={prevAnnouncement}
-              disabled={isTransitioning}
-              aria-label="Предыдущее объявление"
-            >
-              ‹
-            </button>
-            <button 
-              className={`${styles.navButton} ${styles.nextButton}`}
-              onClick={nextAnnouncement}
-              disabled={isTransitioning}
-              aria-label="Следующее объявление"
-            >
-              ›
-            </button>
-          </>
-        )}
+
       </div>
 
-      {/* Индикаторы */}
-      {announcements.length > 1 && (
-        <div className={styles.indicators}>
-          {announcements.map((_, index) => (
-            <button
-              key={index}
-              className={`${styles.indicator} ${index === currentIndex ? styles.active : ''}`}
-              onClick={() => goToAnnouncement(index)}
-              disabled={isTransitioning}
-              aria-label={`Перейти к объявлению ${index + 1}`}
-            />
-          ))}
-        </div>
-      )}
+
     </div>
   );
 };
