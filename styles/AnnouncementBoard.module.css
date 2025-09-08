@@ -556,137 +556,7 @@
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Navigation Buttons - Премиальный дизайн */
-.announcementNavigation {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  pointer-events: none;
-  z-index: 4;
-  padding: 0 32px;
-}
-
-.navButton {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: linear-gradient(145deg, 
-    rgba(30, 41, 59, 0.9) 0%, 
-    rgba(51, 65, 85, 0.8) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: auto;
-  backdrop-filter: blur(20px);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.navButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(123, 199, 255, 0.2) 0%, 
-    rgba(168, 85, 247, 0.2) 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: inherit;
-}
-
-.navButton:hover {
-  background: linear-gradient(145deg, 
-    rgba(51, 65, 85, 0.9) 0%, 
-    rgba(71, 85, 105, 0.8) 100%);
-  color: #7BC7FF;
-  transform: scale(1.1);
-  box-shadow: 
-    0 12px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(123, 199, 255, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  border-color: rgba(123, 199, 255, 0.3);
-}
-
-.navButton:hover::before {
-  opacity: 1;
-}
-
-.navButton:active {
-  transform: scale(0.95);
-}
-
-.navButton:focus {
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    0 0 0 4px rgba(123, 199, 255, 0.3);
-}
-
-.navButton:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none;
-  background: rgba(30, 41, 59, 0.5);
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-.prev {
-  margin-left: 0;
-}
-
-.next {
-  margin-right: 0;
-}
-
-.playPause {
-  position: absolute;
-  bottom: -70px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 48px;
-  height: 48px;
-  font-size: 16px;
-  background: linear-gradient(145deg, 
-    rgba(30, 41, 59, 0.9) 0%, 
-    rgba(51, 65, 85, 0.8) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  backdrop-filter: blur(20px);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-.playPause:hover {
-  background: linear-gradient(145deg, 
-    rgba(51, 65, 85, 0.9) 0%, 
-    rgba(71, 85, 105, 0.8) 100%);
-  color: #7BC7FF;
-  transform: translateX(-50%) scale(1.1);
-  border-color: rgba(123, 199, 255, 0.3);
-  box-shadow: 
-    0 12px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(123, 199, 255, 0.3);
-}
+/* Убираем навигационные кнопки для мобильной версии */
 
 /* Animations */
 @keyframes pulse {
@@ -878,44 +748,162 @@
   animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Responsive Design */
-@media (max-width: 480px) {
+/* Responsive Design - Мобильная оптимизация */
+@media (max-width: 768px) {
   .announcementBoard {
-    padding: 16px;
+    max-width: 100%;
+    margin: 0 auto 20px;
+    border-radius: 16px;
+    box-shadow: 
+      0 8px 25px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+  
+  .announcementHeader {
+    padding: 20px 24px;
+  }
+  
+  .announcementHeader h2 {
+    font-size: 20px;
+  }
+  
+  .announcementIcon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+  }
+  
+  .announcementCounter {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 12px;
   }
   
   .announcementContainer {
-    height: 260px;
+    height: 300px;
   }
   
   .announcementCard {
-    padding: 20px;
+    padding: 24px 20px;
   }
   
-  .announcementTitle {
-    font-size: 16px;
-  }
-  
-  .announcementDescription {
-    font-size: 13px;
+  .announcementType {
+    font-size: 11px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
   }
   
   .announcementEmoji {
-    font-size: 40px;
+    font-size: 36px;
+    margin-bottom: 12px;
   }
   
-  .navButton {
-    width: 36px;
-    height: 36px;
+  .announcementTitle {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  
+  .announcementDescription {
     font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 16px;
   }
   
-  .prev {
-    margin-left: -18px;
+  .announcementIndicators {
+    padding: 20px 24px;
+    gap: 12px;
   }
   
-  .next {
-    margin-right: -18px;
+  .indicator {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .announcementBoard {
+    margin: 0 auto 16px;
+    border-radius: 12px;
+  }
+  
+  .announcementHeader {
+    padding: 16px 20px;
+  }
+  
+  .announcementHeader h2 {
+    font-size: 18px;
+  }
+  
+  .announcementIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+  
+  .announcementCounter {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+  
+  .announcementContainer {
+    height: 280px;
+  }
+  
+  .announcementCard {
+    padding: 20px 16px;
+  }
+  
+  .announcementType {
+    font-size: 10px;
+    padding: 5px 12px;
+    margin-bottom: 14px;
+  }
+  
+  .announcementEmoji {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .announcementTitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  
+  .announcementDescription {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+  
+  .announcementFooter {
+    margin-top: 16px;
+  }
+  
+  .announcementDate {
+    font-size: 11px;
+  }
+  
+  .announcementCta {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 16px;
+  }
+  
+  .announcementIndicators {
+    padding: 16px 20px;
+    gap: 10px;
+  }
+  
+  .indicator {
+    width: 10px;
+    height: 10px;
+    border-width: 1px;
+  }
+  
+  .indicator::after {
+    width: 4px;
+    height: 4px;
   }
 }
 

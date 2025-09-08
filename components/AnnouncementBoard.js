@@ -99,10 +99,12 @@ const AnnouncementBoard = () => {
       
       if (e.key === 'ArrowLeft') {
          e.preventDefault();
-         handleUserNavigation(prevAnnouncement);
+         pauseAutoPlay();
+         prevAnnouncement();
        } else if (e.key === 'ArrowRight') {
          e.preventDefault();
-         handleUserNavigation(nextAnnouncement);
+         pauseAutoPlay();
+         nextAnnouncement();
        } else if (e.key === 'Home') {
          e.preventDefault();
          pauseAutoPlay();
@@ -196,9 +198,11 @@ const AnnouncementBoard = () => {
     // Проверяем расстояние и скорость свайпа
     if (Math.abs(deltaX) > minSwipeDistance || swipeVelocity > 0.5) {
       if (deltaX > 0) {
-        handleUserNavigation(prevAnnouncement); // Свайп вправо - предыдущее
+        pauseAutoPlay();
+        prevAnnouncement(); // Свайп вправо - предыдущее
       } else {
-        handleUserNavigation(nextAnnouncement); // Свайп влево - следующее
+        pauseAutoPlay();
+        nextAnnouncement(); // Свайп влево - следующее
       }
     }
     
@@ -272,7 +276,7 @@ const AnnouncementBoard = () => {
         <div className={styles.announcementIcon}>📢</div>
         <h2>Объявления</h2>
         <div className={styles.announcementCounter}>
-          {currentIndex + 1} / {announcements.length}
+          {announcements.length > 0 ? `${currentIndex + 1} / ${announcements.length}` : '0 / 0'}
         </div>
       </div>
 
@@ -328,33 +332,6 @@ const AnnouncementBoard = () => {
           />
         ))}
       </div>
-
-      {/* Кнопки навигации */}
-        <div className={styles.announcementNavigation}>
-          <button 
-            className={`${styles.navButton} ${styles.prev}`} 
-            onClick={() => handleUserNavigation(prevAnnouncement)}
-            disabled={isTransitioning}
-            aria-label="Предыдущее объявление"
-          >
-            ←
-          </button>
-          <button 
-            className={`${styles.navButton} ${styles.next}`} 
-            onClick={() => handleUserNavigation(nextAnnouncement)}
-            disabled={isTransitioning}
-            aria-label="Следующее объявление"
-          >
-            →
-          </button>
-          <button 
-            className={`${styles.navButton} ${styles.playPause}`} 
-            onClick={() => setIsAutoPlaying(prev => !prev)}
-            aria-label={isAutoPlaying ? 'Приостановить автовоспроизведение' : 'Запустить автовоспроизведение'}
-          >
-            {isAutoPlaying ? '⏸️' : '▶️'}
-          </button>
-        </div>
     </div>
   );
 };
