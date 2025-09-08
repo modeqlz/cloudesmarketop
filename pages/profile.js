@@ -1,16 +1,70 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import LoadingCard from '../components/LoadingCard';
 import { useAuth } from '../lib/useAuth';
 
 export default function ProfilePage() {
   const { user, loading, error, logout } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    bio: '',
+    status: '',
+    interests: '',
+    experience: '',
+    location: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       window.location.replace('/');
     }
+    // Загружаем данные профиля из localStorage
+    if (user) {
+      const savedProfile = localStorage.getItem(`profile_${user.telegram_id}`);
+      if (savedProfile) {
+        setProfileData(JSON.parse(savedProfile));
+      }
+    }
   }, [user, loading]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      // Сохраняем в localStorage (можно заменить на API вызов)
+      localStorage.setItem(`profile_${user.telegram_id}`, JSON.stringify(profileData));
+      setIsEditing(false);
+      // Показываем уведомление об успешном сохранении
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert('Профиль успешно сохранен!');
+      }
+    } catch (err) {
+      console.error('Ошибка сохранения профиля:', err);
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert('Ошибка при сохранении профиля');
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    // Восстанавливаем данные из localStorage
+    const savedProfile = localStorage.getItem(`profile_${user.telegram_id}`);
+    if (savedProfile) {
+      setProfileData(JSON.parse(savedProfile));
+    } else {
+      setProfileData({
+        bio: '',
+        status: '',
+        interests: '',
+        experience: '',
+        location: ''
+      });
+    }
+    setIsEditing(false);
+  };
 
   if (loading) {
     return (
@@ -98,7 +152,149 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div style={{marginTop:16, opacity:.85, fontSize:14}}>
+          {/* Редактируемые поля профиля */}
+          <div className="profile-sections" style={{marginTop: 24}}>
+            {/* О себе */}
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <h3 className="profile-section-title">💬 О себе</h3>
+                {!isEditing && (
+                  <button 
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setIsEditing(true)}
+                    style={{fontSize: '12px', padding: '6px 12px'}}
+                  >
+                    ✏️ Редактировать
+                  </button>
+                )}
+              </div>
+              {isEditing ? (
+                <textarea
+                  className="profile-textarea"
+                  value={profileData.bio}
+                  onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                  placeholder="Расскажите о себе..."
+                  rows={3}
+                />
+              ) : (
+                <div className="profile-field-content">
+                  {profileData.bio || 'Информация не указана'}
+                </div>
+              )}
+            </div>
+
+            {/* Статус */}
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <h3 className="profile-section-title">🎯 Статус</h3>
+              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="profile-input"
+                  value={profileData.status}
+                  onChange={(e) => setProfileData({...profileData, status: e.target.value})}
+                  placeholder="Ваш текущий статус..."
+                />
+              ) : (
+                <div className="profile-field-content">
+                  {profileData.status || 'Статус не указан'}
+                </div>
+              )}
+            </div>
+
+            {/* Интересы */}
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <h3 className="profile-section-title">🎮 Интересы</h3>
+              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="profile-input"
+                  value={profileData.interests}
+                  onChange={(e) => setProfileData({...profileData, interests: e.target.value})}
+                  placeholder="CS2, Dota 2, NFT, трейдинг..."
+                />
+              ) : (
+                <div className="profile-field-content">
+                  {profileData.interests || 'Интересы не указаны'}
+                </div>
+              )}
+            </div>
+
+            {/* Опыт */}
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <h3 className="profile-section-title">⭐ Опыт трейдинга</h3>
+              </div>
+              {isEditing ? (
+                <select
+                  className="profile-select"
+                  value={profileData.experience}
+                  onChange={(e) => setProfileData({...profileData, experience: e.target.value})}
+                >
+                  <option value="">Выберите уровень</option>
+                  <option value="beginner">🌱 Новичок</option>
+                  <option value="intermediate">🚀 Средний уровень</option>
+                  <option value="advanced">💎 Продвинутый</option>
+                  <option value="expert">👑 Эксперт</option>
+                </select>
+              ) : (
+                <div className="profile-field-content">
+                  {profileData.experience === 'beginner' && '🌱 Новичок'}
+                  {profileData.experience === 'intermediate' && '🚀 Средний уровень'}
+                  {profileData.experience === 'advanced' && '💎 Продвинутый'}
+                  {profileData.experience === 'expert' && '👑 Эксперт'}
+                  {!profileData.experience && 'Опыт не указан'}
+                </div>
+              )}
+            </div>
+
+            {/* Локация */}
+            <div className="profile-section">
+              <div className="profile-section-header">
+                <h3 className="profile-section-title">📍 Локация</h3>
+              </div>
+              {isEditing ? (
+                <input
+                  type="text"
+                  className="profile-input"
+                  value={profileData.location}
+                  onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                  placeholder="Ваш город или страна..."
+                />
+              ) : (
+                <div className="profile-field-content">
+                  {profileData.location || 'Локация не указана'}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Кнопки сохранения/отмены */}
+          {isEditing && (
+            <div className="profile-actions" style={{marginTop: 24, display: 'flex', gap: '12px'}}>
+              <button 
+                className="btn btn-primary"
+                onClick={handleSave}
+                disabled={isSaving}
+                style={{flex: 1}}
+              >
+                {isSaving ? '💾 Сохраняем...' : '💾 Сохранить'}
+              </button>
+              <button 
+                className="btn btn-ghost"
+                onClick={handleCancel}
+                disabled={isSaving}
+                style={{flex: 1}}
+              >
+                ❌ Отмена
+              </button>
+            </div>
+          )}
+
+          <div style={{marginTop:24, opacity:.85, fontSize:14, borderTop: '1px solid var(--border)', paddingTop: 16}}>
             <div><b>ID:</b> {user.telegram_id}</div>
             <div><b>Источник:</b> Telegram WebApp</div>
           </div>
