@@ -4,10 +4,13 @@ import styles from '../styles/AnnouncementBoardNew.module.css';
 const AnnouncementBoardNew = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [autoPlayInterval, setAutoPlayInterval] = useState(5000); // 5 секунд по умолчанию
   const containerRef = useRef(null);
   const startXRef = useRef(0);
   const currentXRef = useRef(0);
   const isDraggingRef = useRef(false);
+  const autoPlayTimer = useRef(null);
 
   // Данные объявлений
   const announcements = [
@@ -53,12 +56,42 @@ const AnnouncementBoardNew = () => {
     }
   ];
 
+  // Автоматическое переключение
+  useEffect(() => {
+    if (isAutoPlaying && announcements.length > 1) {
+      autoPlayTimer.current = setInterval(() => {
+        setCurrentIndex((prevIndex) => 
+          prevIndex === announcements.length - 1 ? 0 : prevIndex + 1
+        );
+      }, autoPlayInterval);
+    }
+
+    return () => {
+      if (autoPlayTimer.current) {
+        clearInterval(autoPlayTimer.current);
+      }
+    };
+  }, [isAutoPlaying, autoPlayInterval, announcements.length]);
+
+  // Пауза автоплея при взаимодействии
+  const pauseAutoPlay = () => {
+    setIsAutoPlaying(false);
+    if (autoPlayTimer.current) {
+      clearInterval(autoPlayTimer.current);
+    }
+    // Возобновляем автоплей через 10 секунд после взаимодействия
+    setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 10000);
+  };
+
   // Обработка свайпа
   const handleTouchStart = (e) => {
     if (isTransitioning) return;
     startXRef.current = e.touches[0].clientX;
     currentXRef.current = e.touches[0].clientX;
     isDraggingRef.current = true;
+    pauseAutoPlay();
   };
 
   const handleTouchMove = (e) => {
@@ -87,27 +120,30 @@ const AnnouncementBoardNew = () => {
 
   const goToNext = () => {
     if (isTransitioning || currentIndex >= announcements.length - 1) return;
+    pauseAutoPlay();
     setIsTransitioning(true);
     setCurrentIndex(prev => prev + 1);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 400);
   };
 
   const goToPrevious = () => {
     if (isTransitioning || currentIndex <= 0) return;
+    pauseAutoPlay();
     setIsTransitioning(true);
     setCurrentIndex(prev => prev - 1);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 400);
   };
 
   const goToSlide = (index) => {
     if (isTransitioning || index === currentIndex) return;
+    pauseAutoPlay();
     setIsTransitioning(true);
     setCurrentIndex(index);
-    setTimeout(() => setIsTransitioning(false), 300);
+    setTimeout(() => setIsTransitioning(false), 400);
   };
 
   return (
-    <div className={styles.announcementBoard}>
+    <div className={`${styles.announcementBoard} ${isTransitioning ? styles.transitioning : ''}`}>
       <div className={styles.header}>
         <div className={styles.headerIcon}>📢</div>
         <h2 className={styles.headerTitle}>Объявления</h2>
@@ -161,8 +197,28 @@ const AnnouncementBoardNew = () => {
             className={`${styles.indicator} ${index === currentIndex ? styles.active : ''}`}
             onClick={() => goToSlide(index)}
             aria-label={`Перейти к объявлению ${index + 1}`}
-          />
+          >
+            {index === currentIndex && isAutoPlaying && (
+              <div 
+                className={styles.progressBar}
+                style={{
+                  animationDuration: `${autoPlayInterval}ms`
+                }}
+              />
+            )}
+          </button>
         ))}
+      </div>
+
+      {/* Контролы автоплея */}
+      <div className={styles.controls}>
+        <button 
+          className={`${styles.playPauseBtn} ${isAutoPlaying ? styles.playing : styles.paused}`}
+          onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+          title={isAutoPlaying ? 'Пауза' : 'Воспроизведение'}
+        >
+          {isAutoPlaying ? '⏸️' : '▶️'}
+        </button>
       </div>
     </div>
   );
