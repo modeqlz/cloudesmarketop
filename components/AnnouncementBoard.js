@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../styles/announcementBoard.css';
+import styles from '../styles/AnnouncementBoard.module.css';
 
 const AnnouncementBoard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -267,17 +267,17 @@ const AnnouncementBoard = () => {
   const currentAnnouncement = announcements[currentIndex];
 
   return (
-    <div className="announcement-board">
-      <div className="announcement-header">
-        <div className="announcement-icon">📢</div>
+    <div className={styles.announcementBoard}>
+      <div className={styles.announcementHeader}>
+        <div className={styles.announcementIcon}>📢</div>
         <h2>Объявления</h2>
-        <div className="announcement-counter">
+        <div className={styles.announcementCounter}>
           {currentIndex + 1} / {announcements.length}
         </div>
       </div>
 
       <div 
-        className="announcement-container"
+        className={styles.announcementContainer}
         ref={containerRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -288,35 +288,35 @@ const AnnouncementBoard = () => {
         onMouseLeave={handleMouseUp}
       >
         <div 
-          className={`announcement-card ${isTransitioning ? 'transitioning' : ''}`}
+          className={`${styles.announcementCard} ${isTransitioning ? styles.transitioning : ''}`}
           style={{ background: currentAnnouncement.gradient }}
         >
-          <div className="announcement-type">{currentAnnouncement.type}</div>
+          <div className={styles.announcementType}>{currentAnnouncement.type}</div>
           
-          <div className="announcement-content">
-            <div className="announcement-emoji">{currentAnnouncement.emoji}</div>
-            <h3 className="announcement-title">{currentAnnouncement.title}</h3>
-            <p className="announcement-description">{currentAnnouncement.description}</p>
+          <div className={styles.announcementContent}>
+            <div className={styles.announcementEmoji}>{currentAnnouncement.emoji}</div>
+            <h3 className={styles.announcementTitle}>{currentAnnouncement.title}</h3>
+            <p className={styles.announcementDescription}>{currentAnnouncement.description}</p>
           </div>
           
-          <div className="announcement-footer">
-            <span className="announcement-date">{currentAnnouncement.date}</span>
-            <button className="announcement-cta">Подробнее</button>
+          <div className={styles.announcementFooter}>
+            <span className={styles.announcementDate}>{currentAnnouncement.date}</span>
+            <button className={styles.announcementCta}>Подробнее</button>
           </div>
           
-          <div className="announcement-decorative">
-            <div className="gradient-orb"></div>
-            <div className="floating-emoji">{currentAnnouncement.emoji}</div>
+          <div className={styles.announcementDecorative}>
+            <div className={styles.gradientOrb}></div>
+            <div className={styles.floatingEmoji}>{currentAnnouncement.emoji}</div>
           </div>
         </div>
       </div>
 
       {/* Индикаторы */}
-      <div className="announcement-indicators">
+      <div className={styles.announcementIndicators}>
         {announcements.map((_, index) => (
           <button
             key={index}
-            className={`indicator ${index === currentIndex ? 'active' : ''}`}
+            className={`${styles.indicator} ${index === currentIndex ? styles.active : ''}`}
             onClick={() => {
                if (!isTransitioning && index !== currentIndex) {
                  pauseAutoPlay();
@@ -330,9 +330,9 @@ const AnnouncementBoard = () => {
       </div>
 
       {/* Кнопки навигации */}
-        <div className="announcement-navigation">
+        <div className={styles.announcementNavigation}>
           <button 
-            className="nav-button prev" 
+            className={`${styles.navButton} ${styles.prev}`} 
             onClick={() => handleUserNavigation(prevAnnouncement)}
             disabled={isTransitioning}
             aria-label="Предыдущее объявление"
@@ -340,7 +340,7 @@ const AnnouncementBoard = () => {
             ←
           </button>
           <button 
-            className="nav-button next" 
+            className={`${styles.navButton} ${styles.next}`} 
             onClick={() => handleUserNavigation(nextAnnouncement)}
             disabled={isTransitioning}
             aria-label="Следующее объявление"
@@ -348,7 +348,7 @@ const AnnouncementBoard = () => {
             →
           </button>
           <button 
-            className="nav-button play-pause" 
+            className={`${styles.navButton} ${styles.playPause}`} 
             onClick={() => setIsAutoPlaying(prev => !prev)}
             aria-label={isAutoPlaying ? 'Приостановить автовоспроизведение' : 'Запустить автовоспроизведение'}
           >
