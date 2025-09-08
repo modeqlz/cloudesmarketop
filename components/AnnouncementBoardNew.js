@@ -12,49 +12,78 @@ const AnnouncementBoardNew = () => {
   const isDraggingRef = useRef(false);
   const autoPlayTimer = useRef(null);
 
-  // Данные объявлений
-  const announcements = [
-    {
-      id: 1,
-      type: 'MARKET',
-      title: 'MARKET',
-      subtitle: 'Маркет работает 24/7',
-      description: 'Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры. Более 10,000 предметов в каталоге!',
-      action: 'Читать в Telegram',
-      icon: '📦',
-      background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'
-    },
-    {
-      id: 2,
-      type: 'PROMOTION',
-      title: 'PROMOTION',
-      subtitle: 'Скидка 20% на все операции!',
-      description: 'Только сегодня! Получи скидку на все торговые операции. Не упусти возможность выгодно купить или продать скины.',
-      action: 'Подробнее',
-      icon: '🔥',
-      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-    },
-    {
-      id: 3,
-      type: 'UPDATE',
-      title: 'UPDATE',
-      subtitle: 'Новые функции в приложении',
-      description: 'Добавлены новые фильтры поиска, улучшена система уведомлений и оптимизирована скорость загрузки.',
-      action: 'Узнать больше',
-      icon: '⚡',
-      background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
-    },
-    {
-      id: 4,
-      type: 'EVENT',
-      title: 'EVENT',
-      subtitle: 'Турнир трейдеров',
-      description: 'Участвуй в еженедельном турнире! Лучшие трейдеры получат эксклюзивные награды и бонусы.',
-      action: 'Участвовать',
-      icon: '🏆',
-      background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
-    }
-  ];
+  // Данные объявлений из Supabase
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Загрузка объявлений из API
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const response = await fetch('/api/announcements');
+        const data = await response.json();
+        
+        if (data.ok && data.announcements) {
+          // Преобразуем данные из Supabase в нужный формат
+          const formattedAnnouncements = data.announcements.map(announcement => ({
+            id: announcement.id,
+            type: announcement.type.toUpperCase(),
+            title: announcement.type.toUpperCase(),
+            subtitle: announcement.title,
+            description: announcement.text,
+            action: announcement.telegram_link ? 'Читать в Telegram' : 'Подробнее',
+            link: announcement.telegram_link,
+            icon: getIconByType(announcement.type),
+            background: getBackgroundByType(announcement.type)
+          }));
+          setAnnouncements(formattedAnnouncements);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки объявлений:', error);
+        // Fallback к статическим данным при ошибке
+        setAnnouncements([
+          {
+            id: 1,
+            type: 'MARKET',
+            title: 'MARKET',
+            subtitle: 'Маркет работает 24/7',
+            description: 'Покупай и продавай в любое время! Наш маркет не спит, как и настоящие трейдеры.',
+            action: 'Подробнее',
+            icon: '📦',
+            background: 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
+  // Функция для получения иконки по типу
+  const getIconByType = (type) => {
+    const icons = {
+      'welcome': '🎉',
+      'auction': '🔥',
+      'market': '📦',
+      'update': '⚡',
+      'info': 'ℹ️'
+    };
+    return icons[type] || 'ℹ️';
+  };
+
+  // Функция для получения фона по типу
+  const getBackgroundByType = (type) => {
+    const backgrounds = {
+      'welcome': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'auction': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'market': 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+      'update': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'info': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    };
+    return backgrounds[type] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+  };
 
   // Автоматическое переключение
   useEffect(() => {
@@ -142,6 +171,44 @@ const AnnouncementBoardNew = () => {
     setTimeout(() => setIsTransitioning(false), 400);
   };
 
+  // Обработка клика по кнопке действия
+  const handleActionClick = (announcement) => {
+    if (announcement.link) {
+      window.open(announcement.link, '_blank');
+    }
+  };
+
+  // Показываем индикатор загрузки
+  if (loading) {
+    return (
+      <div className={styles.announcementBoard}>
+        <div className={styles.header}>
+          <div className={styles.headerIcon}>📢</div>
+          <h2 className={styles.headerTitle}>Объявления</h2>
+        </div>
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Загрузка объявлений...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Если нет объявлений
+  if (announcements.length === 0) {
+    return (
+      <div className={styles.announcementBoard}>
+        <div className={styles.header}>
+          <div className={styles.headerIcon}>📢</div>
+          <h2 className={styles.headerTitle}>Объявления</h2>
+        </div>
+        <div className={styles.emptyContainer}>
+          <p className={styles.emptyText}>Пока нет объявлений</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${styles.announcementBoard} ${isTransitioning ? styles.transitioning : ''}`}>
       <div className={styles.header}>
@@ -181,7 +248,10 @@ const AnnouncementBoardNew = () => {
                 <h3 className={styles.slideTitle}>{announcement.subtitle}</h3>
                 <p className={styles.slideDescription}>{announcement.description}</p>
                 
-                <button className={styles.slideAction}>
+                <button 
+                  className={styles.slideAction}
+                  onClick={() => handleActionClick(announcement)}
+                >
                   {announcement.action}
                 </button>
               </div>
@@ -210,16 +280,7 @@ const AnnouncementBoardNew = () => {
         ))}
       </div>
 
-      {/* Контролы автоплея */}
-      <div className={styles.controls}>
-        <button 
-          className={`${styles.playPauseBtn} ${isAutoPlaying ? styles.playing : styles.paused}`}
-          onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-          title={isAutoPlaying ? 'Пауза' : 'Воспроизведение'}
-        >
-          {isAutoPlaying ? '⏸️' : '▶️'}
-        </button>
-      </div>
+
     </div>
   );
 };
